@@ -24,3 +24,7 @@
 | DESIGN-03 | User §4, §6, §9 | No unreasoned banned defaults; accessible, audited UI | Codex documents justified exceptions and 30-point §9 audit | Overall score ≥85, no category <60, record fixes and check mobile/focus/reduced-motion | NOT IMPLEMENTED |
 
 Update statuses with direct test commands or screenshots and Git commit IDs. Do not bulk-mark complete. Minimum functional P0 requirements are PS-01..05 plus CORE-01..08.
+
+## Frontend approval checkpoint
+
+DESIGN-02 and DESIGN-03 are implemented and reviewed; see DESIGN.md, style-guide.html and docs/DESIGN_AUDIT.md. PS-03 presentation workflows have frontend tests, but full real-result integration remains pending approval. All scientific/data/solver/scenario/cloud acceptance rows above remain unfulfilled until Phases 4–6. The user-requested frontend-first sequence supersedes the historical backend-first gates.

@@ -2,7 +2,9 @@
 
 **Balancing the Future of Cities.** A research-grounded urban sustainability decision engine for a 24-hour hackathon.
 
-> **Repository status:** Initial *planning and fixture scaffold*. The full application and five MVP modules have **not yet been implemented**. This is prepared for development with Codex.
+> **Current status:** Frontend approval build (Phases 1–3). Run `streamlit run app.py` to inspect all four sections. Demonstration data is labelled throughout. The scientific engine, MILP, validated datasets and AWS integrations remain pending frontend approval. See [frontend review and launch instructions](docs/FRONTEND_REVIEW.md) and [design audit](docs/DESIGN_AUDIT.md).
+
+The historical handoff notes below describe the original baseline; they are retained as project context.
 
 ## Official goal
 Choose feasible combinations of **green roofs, urban forests, rainwater harvesting, and drainage improvements** while balancing environmental impact, economic feasibility and social equity under scarce land, limited budgets and climate uncertainties.

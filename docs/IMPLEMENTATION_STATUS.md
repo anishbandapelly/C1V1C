@@ -1,18 +1,20 @@
-# Implementation status — handoff revision 2
+# Implementation status — frontend approval candidate
 
-**Only the planning scaffold, synthetic fixtures, preflight and reference tests have been prepared. Core functionality has NOT been built.** Status must be updated by implementers with test commands, actual pass/fail evidence, and commit references.
+Phases 1–3 implemented for review; backend work deliberately awaits user approval.
 
-| Module | Current status | Proven evidence | Next owner task |
-| --- | --- | --- | --- |
-| Data Engine | NOT IMPLEMENTED | Synthetic fixture files + blank templates + provenance guidance | Typed contracts, source validation, verified/mixed data handling |
-| AI Optimisation | NOT IMPLEMENTED | Tiny brute-force reference test only | MILP, site feasibility, objective coefficients, portfolio evaluation |
-| Interactive Dashboard | NOT IMPLEMENTED | No application UI | Four tabs with real results; follow `anti-slop-design.md` workflow; audit §9 |
-| Scenario Simulator | NOT IMPLEMENTED | Synthetic scenario multipliers only | Three shocks, frozen-plan stress and reoptimised run |
-| Decision Explainer | NOT IMPLEMENTED | Research/source register only | Deterministic decision trace and uncertainty; Bedrock optional |
-| AWS S3/Bedrock | NOT CONNECTED | Config/runbook only; no auth checked | AWS permissions & tested adapters with fallbacks |
-| Real pilot data | NOT VERIFIED | Source leads only; synthetic fixtures | Actual geometry, baseline, costs and traceable coefficients |
-| User Anti-Slop design guide | PROVIDED — UI AUDIT PENDING | Exact uploaded `anti-slop-design.md` at root and mirrored in docs | Codex creates `DESIGN.md` + `style-guide.html`, then documents §9 scoring before UI review |
-| GitHub remote | NOT VERIFIED | Local Git history only | Create/link repository and push current main |
-| Bootstrap tests | PARTIAL — scaffold only | Reference fixture + handoff integrity pytest | Add module/integration/solver tests in actual code |
+| Area | Status | Evidence |
+|---|---|---|
+| Design direction / tokens / style guide | Implemented | DESIGN.md; light/dark style-guide.html; initial design commit 10f0d80 |
+| Four-section frontend | Implemented with demonstration fixtures | app.py; ui/views.py; frontend commit a3eb707 |
+| Frontend workflow testing | PASS | 17 new tests; 33 total pytest tests; real Edge browser navigation and export |
+| Anti-Slop review | PASS self-audit | docs/DESIGN_AUDIT.md; screenshots and contrast measurements |
+| Data engine / validated pilot datasets | Pending approval | Source leads only; synthetic input explicitly labelled |
+| Physical models / MILP / equity | Pending approval | No solver or model invoked by frontend |
+| Scenario engine | Pending approval | Frontend saves parameters and preserves selection; physical calculations not implemented |
+| Decision explainer | Pending approval | UI evidence/reasons layout only, not computed solver explanations |
+| Immutable production run store | Pending approval | Session-only preview snapshots and JSON/Markdown export available |
+| AWS S3 / Bedrock | Not connected | No live AWS operations; Hyderabad configuration preserved |
+| Deployment | Local frontend preview running | Full production release not attempted before P0 and frontend approval |
 
-**Do not advertise this repository as a working urban sustainability application.**
+See docs/FRONTEND_REVIEW.md for commands, coverage, limitations and handoff contracts.
+Passing frontend and reference tests does not certify the five production modules.

@@ -13,7 +13,8 @@ def apply_theme():
     p,li {line-height:var(--leading-body)}
     [data-testid=stMetricValue] {font-family:var(--font-display);font-variant-numeric:tabular-nums}
     [data-testid=stMetric] {border-top:var(--border-width) solid var(--color-border);padding-top:var(--space-3)}
-    .stButton button,.stDownloadButton button,[data-baseweb=select]>div {min-height:var(--control-height)}
+    .stApp button,.stButton button,.stDownloadButton button,[data-baseweb=select]>div,[data-testid=stNumberInputContainer],summary {min-height:var(--control-height);min-width:var(--control-height)}
+    button {min-height:var(--control-height)!important;min-width:var(--control-height)!important;flex-shrink:0!important}
     [data-testid=stRadio] label {min-height:var(--control-height);align-items:center}
     [data-testid=stCheckbox] label {min-height:var(--control-height)}
     [data-testid=stCaptionContainer],[data-testid=stCaptionContainer] p {color:var(--color-text-muted)!important;opacity:1!important}
