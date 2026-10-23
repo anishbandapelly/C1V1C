@@ -1,14 +1,36 @@
 """Four frontend views; no backend/model execution in this phase."""
 import json
+from html import escape
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from .contracts import ScenarioRequest
 from .fixtures import LABELS, WEIGHTS, KEYS, PORTFOLIOS, DISPLAY_OUTCOMES, catalogue, zones, preview, ROOT
-from .theme import chart_style
+from .theme import chart_style, palette
+from .shell import navigate
 
 def ledger(rows):
-    st.dataframe(pd.DataFrame(rows), hide_index=True, width='stretch')
+    if not rows:
+        st.caption('No items selected.')
+        return
+    # Semantic tables expose all values to assistive technology and theme reliably.
+    table=pd.DataFrame(rows).to_html(index=False,escape=True,border=0)
+    st.html('<div class="data-ledger" role="region" aria-label="Data table" tabindex="0">'+table+'</div>')
+
+def preflight(title,description,steps):
+    st.html('<section class="preflight"><h2>'+escape(title)+'</h2><p>'+escape(description)+'</p><ol>'+''.join('<li>'+escape(s)+'</li>' for s in steps)+'</ol></section>')
+
+def home():
+    st.html('''<section class="hero"><div><img class="hero-logo logo-light" src="/app/static/brand/logo-light.png" alt="C1V1C — Tulabhara AI"><img class="hero-logo logo-dark" src="/app/static/brand/logo-dark.png" alt="C1V1C — Tulabhara AI"><p class="hero-kicker">Bengaluru pilot · urban decision intelligence</p><h1>Every investment has a trade-off.</h1><p class="lead">Cooler streets, less flooding, more water. A city needs all three—but land and budgets are finite.</p><p>C1V1C brings risks, investment choices and climate stresses into one evidence-led workspace, so planners can see what a decision costs, who it serves and what it leaves unresolved.</p></div><div class="balance-board"><h2>The sustainability paradox</h2><div class="balance-row"><strong>More tree cover</strong><b>↔</b><span>Irrigation during drought</span></div><div class="balance-row"><strong>Green roofs</strong><b>↔</b><span>Space for water capture</span></div><div class="balance-row"><strong>Better drainage</strong><b>↔</b><span>Downstream capacity</span></div><div class="balance-row"><strong>Limited capital</strong><b>↔</b><span>Benefits across neighbourhoods</span></div><p class="balance-note">Compare the whole decision—not a single environmental score.</p></div></section>''')
+    a,b=st.columns([1,1])
+    a.button('Explore the pilot',type='primary',on_click=navigate,args=('City Intelligence',),width='stretch')
+    b.button('Build an investment preview',on_click=navigate,args=('Investment Optimiser',),width='stretch')
+    st.html('''<section class="workflow-strip" aria-label="Planning workflow"><div class="workflow-step"><span>01 / Understand</span><strong>City Intelligence</strong><p>See where risks differ and which inputs still need evidence.</p></div><div class="workflow-step"><span>02 / Allocate</span><strong>Investment Optimiser</strong><p>Compare choices within a budget and inspect who receives investment.</p></div><div class="workflow-step"><span>03 / Stress-test</span><strong>Climate Shock Lab</strong><p>Review a plan under rainfall, drought or a smaller budget.</p></div><div class="workflow-step"><span>04 / Explain</span><strong>Decision Intelligence</strong><p>Keep assumptions, limitations and evidence alongside the decision.</p></div></section>''')
+    a,b=st.columns(2)
+    a.button('Explore climate scenarios',on_click=navigate,args=('Climate Shock Lab',),width='stretch')
+    b.button('Inspect the decision trail',on_click=navigate,args=('Decision Intelligence',),width='stretch')
+    with st.expander('What is available in this frontend review?'):
+        st.write('All four workflows are interactive previews. Costs and profiles are synthetic fixtures, not observed Bengaluru data. The scientific engine and AI optimisation are not connected yet. Start with City Intelligence or create a display portfolio to inspect the later steps.')
 
 def outcomes(fixture):
     st.caption('Display-only outcome fixture · invented for UI review, not model calculations.')
@@ -18,29 +40,30 @@ def outcomes(fixture):
         col.metric(label,value)
 
 def city():
-    st.title('Read the city. Locate the gaps.')
-    st.write('Inspect the Yelahanka pilot context before choosing where to invest.')
+    st.title('Where does the city need attention?')
+    st.write('Compare the Yelahanka fixture profiles, then inspect the evidence behind each indicator.')
     left,right = st.columns([2.2,1], gap='large')
     with left:
         c1,c2=st.columns(2)
-        layer=c1.selectbox('Geographic layer',['Heat exposure','Runoff coefficient','Population','Eligible roof','Plantable land','Source coverage'])
-        tiles=c2.toggle('Online street basemap',value=True,help='Uses CARTO / OpenStreetMap tiles. Turn off for the offline coordinate view.')
+        layer=c1.selectbox('Geographic layer',['Heat exposure','Runoff coefficient','Population','Eligible roof','Plantable land','Source coverage'],key='input_layer')
+        tiles=c2.toggle('Online street basemap',value=True,help='Uses CARTO / OpenStreetMap tiles. Turn off for the offline coordinate view.',key='input_tiles')
         field={'Heat exposure':'heat_index','Runoff coefficient':'runoff_coefficient','Population':'population','Eligible roof':'suitable_roof_m2','Plantable land':'plantable_land_m2','Source coverage':None}[layer]
         zz=zones()
         values=[float(z[field]) if field else 0 for z in zz]
         # Approximate display markers only. These are NOT zone centroids/boundaries.
         fig=go.Figure(go.Scattermap(lat=[13.106,13.096,13.087],lon=[77.592,77.609,77.586],
             mode='markers+text',text=['A · rain fixture','B · heat fixture','C · water fixture'],
-            customdata=['A','B','C'],marker=dict(size=28,color=values,colorscale=[[0,'#c5d7ca'],[1,'#245640']],showscale=bool(field),colorbar=dict(title=layer)),
+            customdata=['A','B','C'],marker=dict(size=28,color=values,colorscale=[[0,palette()['chart-soft']],[1,palette()['accent']]],showscale=bool(field),colorbar=dict(title=dict(text=layer,side='bottom'),orientation='h',thickness=12)),
+            textfont=dict(color=palette()['text']),
             hovertemplate='%{text}<br>Illustrative marker, not a surveyed site<extra></extra>'))
-        fig.update_layout(map=dict(style='carto-positron' if tiles else 'white-bg',center=dict(lat=13.097,lon=77.596),zoom=12),height=440)
+        fig.update_layout(map=dict(style=palette()['map-style'] if tiles else {'version':8,'sources':{},'layers':[{'id':'background','type':'background','paint':{'background-color':palette()['surface']}}]},center=dict(lat=13.097,lon=77.596),zoom=12),height=410)
         chart_style(fig)
         st.plotly_chart(fig,width='stretch',key='pilot_map',config={'displayModeBar':False,'scrollZoom':True})
-        st.caption('Approximate Yelahanka context · WGS84. A/B/C markers are illustrative placements, not verified zone centroids or boundaries. Pan, zoom and hover to inspect. Select the matching profile below.')
+        st.caption('Yelahanka context · WGS84. Pan, zoom or hover; use the profile selector to inspect A/B/C. Markers are illustrative, not verified boundaries.')
         if not tiles:
             st.info('Offline coordinate view: street tiles are disabled. Marker positions are display assumptions only.')
     with right:
-        zone=st.selectbox('Neighbourhood fixture',['A','B','C'],format_func=lambda x:{'A':'A — Rain stress','B':'B — Heat stress','C':'C — Water stress'}[x])
+        zone=st.selectbox('Neighbourhood fixture',['A','B','C'],format_func=lambda x:{'A':'A — Rain stress','B':'B — Heat stress','C':'C — Water stress'}[x],key='input_zone')
         z=next(z for z in zz if z['zone_id']==zone)
         st.subheader('Planning profile')
         st.caption('D · synthetic fixture / no observation date')
@@ -61,13 +84,13 @@ def city():
         st.warning('All candidate locations and eligibility are unverified. The frontend catalogue is not an engineering suitability assessment.')
     with st.expander('Source register · leads, coverage and provenance'):
         st.write('Verified pilot coverage: no downloaded, validated Bengaluru inputs in this repository yet.')
-        st.dataframe(pd.read_csv(ROOT/'data/source_registry.csv'),hide_index=True,width='stretch')
+        ledger(pd.read_csv(ROOT/'data/source_registry.csv').fillna('Not recorded').to_dict('records'))
         st.download_button('Download source register',(ROOT/'data/source_registry.csv').read_bytes(),'source-register.csv','text/csv')
 
 def optimiser():
-    st.title('Make room for a better plan.')
-    st.write('Set investment constraints and inspect a demonstration portfolio across the three fixture zones.')
-    controls,result=st.columns([1,2],gap='large')
+    st.title('What can your investment include?')
+    st.write('Set the budget, choose a display portfolio and compare its costs before reviewing the trade-offs.')
+    controls,result=st.columns([1,1.65],gap='large')
     with controls:
         st.subheader('Investment envelope')
         budget=st.number_input('Capital budget · INR crore',min_value=0.0,max_value=100.0,value=2.0,step=.1,key='budget')
@@ -76,10 +99,12 @@ def optimiser():
             raw=[st.number_input(label+' weight · %',0,100,v,key=f'{mode}-{k}') for k,label,v in zip(KEYS,['Flood','Water','Heat','Carbon','Equity','Lifecycle cost'],WEIGHTS[mode])]
             total=sum(raw)
             st.caption(f'Total: {total}%. Must equal 100%. These are policy preferences, not extra physical benefits.')
-        types=st.multiselect('Interventions to consider',list(LABELS),default=list(LABELS),format_func=LABELS.get)
-        floor=st.slider('Priority-zone benefit floor · normalised',0.0,1.0,0.0,.05,help='Future hard constraint. The display fixture cannot verify a nonzero floor.')
-        fixture=st.selectbox('Display portfolio',list(PORTFOLIOS),help='Manually authored examples, not computed recommendations.')
-        view_state=st.selectbox('Review state',['Ready','Loading example','Infeasible example','Service error example','Missing data example'],help='Explicit frontend QA controls; no service is contacted.')
+        types=st.multiselect('Interventions to consider',list(LABELS),default=list(LABELS),format_func=LABELS.get,key='input_types')
+        with st.expander('Equity safeguard'):
+            floor=st.slider('Priority-zone benefit floor · normalised',0.0,1.0,0.0,.05,help='Future hard constraint. The display fixture cannot verify a nonzero floor.',key='input_floor')
+        fixture=st.selectbox('Display portfolio',list(PORTFOLIOS),help='Manually authored examples, not computed recommendations.',key='input_fixture')
+        with st.expander('Frontend review states'):
+            view_state=st.selectbox('Review state',['Ready','Loading example','Infeasible example','Service error example','Missing data example'],help='Explicit frontend QA controls; no service is contacted.',key='input_review_state')
         clicked=st.button('Preview allocation',type='primary',width='stretch')
         st.caption('No optimiser is connected in this review build. Only the displayed project cost is summed.')
     request=None
@@ -116,7 +141,13 @@ def optimiser():
         if st.session_state.get('preview_error'): st.error(st.session_state['preview_error'])
         snap=st.session_state.get('active_preview')
         if not snap:
-            st.info('No allocation preview yet. Choose a display portfolio, then preview its cost and layout.')
+            preflight('Start with the investment envelope','A useful plan makes its constraints visible before showing any outcomes.',[
+                'Set the capital budget and choose which interventions to consider.',
+                'Choose a display portfolio and preview its total cost.',
+                'Compare alternatives, then take the saved selection into Climate Shock Lab.'])
+            st.subheader('The four choices in this catalogue')
+            ledger([{'Intervention':LABELS[t],'Unit cost · INR lakh':v/100000,'Main constraint':c} for t,v,c in [('green_roof',3000000,'Shared roof area'),('urban_forest',2000000,'Land and irrigation'),('rainwater_harvesting',1200000,'Catchment and storage'),('drainage_upgrade',5000000,'Eligible drainage asset')]])
+            st.caption('Synthetic catalogue · Master §5.1a. Preview checks costs only; it does not solve or validate environmental outcomes.')
             return
         stale=(request is None or request!=snap.request or fixture!=snap.fixture_name)
         if stale: st.warning('Inputs changed. Showing the saved preview below; use Preview allocation to apply current controls.')
@@ -128,7 +159,7 @@ def optimiser():
         chosen=[r for r in catalogue() if r['ID'] in snap.selected_ids]
         if chosen:
             ledger([{k:v for k,v in r.items() if k!='type'} for r in chosen])
-            fig=go.Figure(go.Bar(x=[r['Capital · INR']/1e6 for r in chosen],y=[r['ID'] for r in chosen],orientation='h',marker_color='#245640'))
+            fig=go.Figure(go.Bar(x=[r['Capital · INR']/1e6 for r in chosen],y=[r['ID'] for r in chosen],orientation='h',marker_color=palette()['accent']))
             fig.update_layout(xaxis_title='Capital cost · INR million',height=280)
             st.plotly_chart(chart_style(fig),width='stretch')
         else: st.info('No projects selected. Zero investment is a valid display baseline.')
@@ -153,16 +184,21 @@ def optimiser():
             st.caption('Outcome comparison specimen · manually authored UI values, not evaluated alternatives. All fixtures use the same display units; carbon is withheld.')
             metric=st.selectbox('Comparison metric',['Peak exceedance reduction · m³/s','Usable water · m³/year','Heat exposure reduction · person-index'])
             idx=['Peak exceedance reduction · m³/s','Usable water · m³/year','Heat exposure reduction · person-index'].index(metric)
-            fig=go.Figure(go.Bar(x=comparisons,y=[DISPLAY_OUTCOMES[n][idx] for n in comparisons],marker_color='#245640'))
+            fig=go.Figure(go.Bar(x=comparisons,y=[DISPLAY_OUTCOMES[n][idx] for n in comparisons],marker_color=palette()['accent']))
             fig.update_layout(yaxis_title=metric,height=280)
             st.plotly_chart(chart_style(fig),width='stretch')
 
 def shock_lab():
-    st.title('Stress the plan, not the evidence.')
-    st.write('Set a disruption and inspect the before-and-after comparison workflow.')
+    st.title('Will the plan hold under pressure?')
+    st.write('Keep the original selection fixed, change one stress condition and inspect what must be reconsidered.')
     snap=st.session_state.get('active_preview')
     if not snap:
-        st.info('Create an allocation preview in Investment Optimiser before testing the shock comparison layout.')
+        preflight('First, give the lab a plan to test','The comparison needs a saved selection so the original plan cannot quietly change during a stress test.',[
+            'Extreme rainfall: inspect runoff and drainage capacity under a stronger storm.',
+            'Drought: examine water availability, irrigation and cooling assumptions.',
+            'Budget cut: check the revised envelope while retaining committed costs.'])
+        st.button('Create an investment preview',type='primary',on_click=navigate,args=('Investment Optimiser',))
+        st.caption('No scenario has run. These are user-defined stress conditions, not forecasts.')
         return
     st.caption('Frozen original selection: '+snap.preview_id)
     c1,c2=st.columns([1,2],gap='large')
@@ -182,7 +218,11 @@ def shock_lab():
     with c2:
         saved=st.session_state.get('shock_preview')
         if not saved or saved['original_id']!=snap.preview_id:
-            st.info('No comparison preview for this allocation. Set a stress condition and preview the layout.')
+            preflight('One original plan. Two comparisons.','Submit the stress settings to preserve a clear before-and-after record.',[
+                'Original plan: the saved budget and selected project IDs.',
+                'Original under shock: the same selection against changed conditions.',
+                'Replanned alternative: reserved for a separately computed solver result after integration.'])
+            st.caption('Your current selection stays frozen. Parameter records and budget arithmetic work now; environmental calculations remain unavailable.')
             return
         if saved['shock']!=shock or saved['factors']!=factors or saved['commitments']!=commitments:
             st.warning('Stress controls changed. The table retains the last submitted preview.')
@@ -197,7 +237,7 @@ def shock_lab():
         if snap.cost_inr>revised: st.error('Original fixture portfolio exceeds the revised capital envelope. This is a budget check, not a solver feasibility result.')
         if committed_cost>revised: st.error('Committed fixture cost exceeds the revised envelope; commitments cannot be silently removed.')
         st.metric('Remaining after commitments · INR',f'{revised-committed_cost:,.0f}')
-        fig=go.Figure(go.Bar(x=['Original envelope','Revised envelope','Original fixture cost'],y=[snap.request.budget_inr/1e6,revised/1e6,snap.cost_inr/1e6],marker_color=['#526159','#245640','#79520b']))
+        fig=go.Figure(go.Bar(x=['Original envelope','Revised envelope','Original fixture cost'],y=[snap.request.budget_inr/1e6,revised/1e6,snap.cost_inr/1e6],marker_color=[palette()['muted'],palette()['accent'],palette()['warning']]))
         fig.update_layout(yaxis_title='INR million',height=280)
         st.plotly_chart(chart_style(fig),width='stretch')
         with st.expander('Inspect environmental comparison layout · static demonstration'):
@@ -205,23 +245,29 @@ def shock_lab():
             metric=st.selectbox('Shock comparison specimen',['Peak exceedance · m³/s','Usable water · m³/year','Heat exposure · person-index'])
             examples={'Peak exceedance · m³/s':[.3,.5,.35],'Usable water · m³/year':[270,160,190],'Heat exposure · person-index':[900,1100,950]}
             labels=['Original / normal','Original / shock','Replanned / shock']
-            fig=go.Figure(go.Bar(x=labels,y=examples[metric],marker_color=['#526159','#79520b','#245640']))
+            fig=go.Figure(go.Bar(x=labels,y=examples[metric],marker_color=[palette()['muted'],palette()['warning'],palette()['accent']]))
             fig.update_layout(yaxis_title=metric,height=290)
             st.plotly_chart(chart_style(fig),width='stretch')
             ledger([{'State':label,metric:value,'Evidence':'D · UI specimen'} for label,value in zip(labels,examples[metric])])
             st.write('Project change specimen: retain A drainage; add C harvesting; defer B forest. These are layout examples only, not changes to the frozen selection.')
-        with st.expander('Parameter record and required model updates',expanded=True):
+        with st.expander('Parameter record and required model updates'):
             st.json(saved)
             st.write({'Extreme rainfall':'Recompute peak runoff and capacity exceedance while keeping the original project counts frozen.',
                       'Drought':'Recompute tank time series, irrigation demand and bounded heat exposure effects.',
                       'Sudden budget cut':'Re-solve with the revised envelope, preserving commitments and explicitly reporting overspend.'}[saved['shock']])
 
 def decisions():
-    st.title('A decision should leave a trail.')
-    st.write('Review saved preview inputs, compare alternatives and export the assumptions alongside the numbers.')
+    st.title('What supports this decision?')
+    st.write('Follow the selection, its distribution and its evidence before exporting a review brief.')
     history=st.session_state.get('history',{})
     if not history:
-        st.info('No saved previews yet. Preview an allocation to build this decision ledger.')
+        preflight('A decision trail starts with a selection','Save an allocation preview to inspect the reasons, assumptions and distribution in one place.',[
+            'Selection: which projects are included, and what do their fixture costs add up to?',
+            'Distribution: how much investment reaches each synthetic neighbourhood?',
+            'Evidence: what is known, what is assumed and what must be validated?'])
+        st.button('Build the first decision preview',type='primary',on_click=navigate,args=('Investment Optimiser',))
+        with st.expander('What will the exported brief contain?'):
+            st.write('The saved preview ID, budget, selected projects, objective weights, source and model versions, and explicit limitations. Export never upgrades demonstration values into measured results.')
         return
     selected=st.selectbox('Saved preview',list(history),format_func=lambda k:f'{history[k].fixture_name} / {k}')
     snap=history[selected]
@@ -243,7 +289,7 @@ def decisions():
         ledger(rows)
         st.caption('Investment per resident is not an equity outcome. Population-weighted environmental benefits and residual risks require the evaluator.')
         st.subheader('Declared priorities')
-        fig=go.Figure(go.Bar(x=list(snap.request.weights),y=list(snap.request.weights.values()),marker_color='#245640'))
+        fig=go.Figure(go.Bar(x=list(snap.request.weights),y=list(snap.request.weights.values()),marker_color=palette()['accent']))
         fig.update_layout(yaxis_title='Requested objective weight',height=260)
         st.plotly_chart(chart_style(fig),width='stretch')
         st.caption('Weights are shown, not score contributions. Contribution and constraint-slack data are unavailable until the solver runs.')

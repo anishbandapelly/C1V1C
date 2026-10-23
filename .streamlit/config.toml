@@ -1,11 +1,12 @@
 [theme]
 base = "light"
-primaryColor = "#245640"
-backgroundColor = "#f4f1e9"
-secondaryBackgroundColor = "#fffdf7"
-textColor = "#202e28"
-font = "sans serif"
+primaryColor = "#216E44"
+backgroundColor = "#F6F8F7"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#12302F"
+font = "Outfit"
 [server]
 headless = true
+enableStaticServing = true
 [browser]
 gatherUsageStats = false

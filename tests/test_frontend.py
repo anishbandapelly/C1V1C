@@ -12,7 +12,8 @@ def request(**changes):
 
 def app(page='City Intelligence'):
     a=AppTest.from_file(Path(__file__).resolve().parents[1]/'app.py',default_timeout=30).run()
-    a.radio[0].set_value(page).run()
+    a.session_state['page']=page
+    a.run()
     assert not a.exception
     return a
 
@@ -25,7 +26,7 @@ def submit(a):
     assert not a.exception
     return a
 
-@pytest.mark.parametrize('page',['City Intelligence','Investment Optimiser','Climate Shock Lab','Decision Intelligence'])
+@pytest.mark.parametrize('page',['Home','City Intelligence','Investment Optimiser','Climate Shock Lab','Decision Intelligence'])
 def test_navigation_and_honesty(page):
     a=app(page)
     assert any('Demonstration data' in x.value for x in a.warning)
@@ -81,13 +82,15 @@ def test_weights_and_equity_validation():
 def test_shocks_preserve_original_selection(shock):
     a=submit(app('Investment Optimiser'))
     original=a.session_state['active_preview']
-    a.radio[0].set_value('Climate Shock Lab').run()
+    a.session_state['page']='Climate Shock Lab'
+    a.run()
     choose(a,'selectbox','Disruption',shock)
     next(b for b in a.button if b.label=='Preview shock comparison').click().run()
     assert not a.exception
     assert a.session_state['shock_preview']['ids']==list(original.selected_ids)
     assert a.session_state['active_preview']==original
-    a.radio[0].set_value('Decision Intelligence').run()
+    a.session_state['page']='Decision Intelligence'
+    a.run()
     assert not a.exception
     assert len(a.get('download_button'))==2
 
@@ -95,3 +98,34 @@ def test_zone_selection_updates_profile():
     a=app()
     choose(a,'selectbox','Neighbourhood fixture','B')
     assert any(x.value=='6,500' for x in a.metric)
+
+def test_home_entry_points_and_guest_contract():
+    from ui.shell import ProfileView
+    a=app('Home')
+    next(x for x in a.button if x.label=='Explore the pilot').click().run()
+    assert a.session_state['page']=='City Intelligence'
+    assert not ProfileView().authenticated and ProfileView().display_name=='Guest workspace'
+
+def test_planning_inputs_survive_navigation():
+    a=app('Investment Optimiser')
+    choose(a,'number_input','Capital budget · INR crore',3.5)
+    choose(a,'selectbox','Display portfolio','Water emphasis')
+    a.session_state['page']='Home';a.run()
+    a.session_state['page']='Investment Optimiser';a.run()
+    assert next(x for x in a.number_input if x.label=='Capital budget · INR crore').value==3.5
+    assert next(x for x in a.selectbox if x.label=='Display portfolio').value=='Water emphasis'
+
+@pytest.mark.parametrize('page',['Climate Shock Lab','Decision Intelligence'])
+def test_preanalysis_has_a_working_next_action(page):
+    a=app(page)
+    a.button[0].click().run()
+    assert a.session_state['page']=='Investment Optimiser'
+
+def test_theme_palettes_meet_text_contrast_and_chart_remap():
+    from ui.theme import PALETTES
+    def lum(h):
+        c=[int(h[i:i+2],16)/255 for i in (1,3,5)]
+        return sum((v/12.92 if v<=.04045 else ((v+.055)/1.055)**2.4)*w for v,w in zip(c,[.2126,.7152,.0722]))
+    for p in PALETTES.values():
+        for a,b in [('text','bg'),('muted','bg'),('text','surface'),('muted','surface'),('accent-fg','accent'),('link','bg')]:
+            lo,hi=sorted([lum(p[a]),lum(p[b])]);assert (hi+.05)/(lo+.05)>=4.5
