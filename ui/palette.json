@@ -1,0 +1,14 @@
+{
+  "light": {
+    "bg": "#F6F8F7", "surface": "#FFFFFF", "sidebar": "#EAF0ED", "raised": "#EEF4F1",
+    "text": "#12302F", "muted": "#516763", "border": "#81958D", "rule": "#D2DEDA",
+    "accent": "#216E44", "accent-fg": "#FFFFFF", "link": "#2A6FB5", "success": "#216E44",
+    "warning": "#805513", "danger": "#AF342F", "selected": "#DCEAE2", "chart-soft": "#B5D9C5", "map-style": "carto-positron"
+  },
+  "dark": {
+    "bg": "#0D201F", "surface": "#15302E", "sidebar": "#102725", "raised": "#1C3A36",
+    "text": "#F6F8F7", "muted": "#B4C8C1", "border": "#76958A", "rule": "#36564D",
+    "accent": "#7CD6A4", "accent-fg": "#102725", "link": "#8ABFF0", "success": "#7CD6A4",
+    "warning": "#EAC27C", "danger": "#FFB2AA", "selected": "#22463B", "chart-soft": "#406E59", "map-style": "carto-darkmatter"
+  }
+}

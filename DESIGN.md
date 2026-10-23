@@ -1,71 +1,88 @@
-# C1V1C — design direction
+# C1V1C — brand-led frontend system
 
 ## Direction
-An urban planning desk for Bengaluru resilience analysts: precise, grounded, calm.
-Archetype: tool/dashboard. A large editorial serif title and a ruled evidence ledger
-deviate from the neutral dashboard to give civic decisions appropriate weight.
-Anchor: survey drawings, municipal ledger paper and the deep green of Bengaluru's
-tree canopy. Geography, units and source quality provide the visual identity.
-Assumptions: no existing logo or font must be preserved; English is the initial
-interface; analysts use desktop workstations but reviews must work on phones.
+A calm, capable urban decision workspace for city planners, judges and analysts.
+The supplied 24 October brand sheet is authoritative: water, canopy and city form
+connect environmental choices without decorative technology imagery.
+Archetype: tool/dashboard with an integrated orientation home, explicitly requested
+by the user. Evolve the existing Streamlit app; preserve contracts and preview logic.
 
-## Workflow and scope
-Read AGENTS, the complete Anti-Slop guide, original PS DOCX, master Markdown and
-checked its long text against the authoritative DOCX; supporting handoff, evidence,
-data, AWS and acceptance documents were reviewed before code.
-User's frontend-first request supersedes the repository's backend-first sequence.
-User explicitly requests one approval gate after frontend testing, so the style
-guide precedes pages in Git but is reviewed with them at Phase 3.
-No backend, solver, scientific model or live cloud work belongs to this phase.
+## Brand source
+Original horizontal PNG files copied byte-for-byte to static/brand. Light logo on
+Mist/white, white logo on Civic Ink/dark surfaces. Preserve the full 1406:620 aspect
+ratio and all supplied transparent margins; no cropping, recoloring or recreated mark.
+No separate small icon asset was supplied: the collapsed rail uses a labelled Home
+icon, not a fabricated official symbol. Brand sheet is a visual reference, not an
+instruction to change engineering scope. The PDF has one page and agrees with PNG.
 
-## Colors
-| Human name | Token | Light | Dark | Role |
-|---|---|---|---|---|
-| Ledger paper | bg | #f4f1e9 | #151c19 | Main canvas, ~70% |
-| Drawing sheet | surface | #fffdf7 | #202b25 | Controls and evidence |
-| Survey ink | text | #202e28 | #f4f1e9 | Text |
-| Pencil | muted | #526159 | #bbc9c0 | Secondary text |
-| Rule | border | #78857b | #81958a | Boundaries |
-| Canopy | accent | #245640 | #acd6b5 | Actions, <10% |
-| Caution ink | warning | #79520b | #f0c477 | Evidence caveats |
-| Correction ink | danger | #a13327 | #ffb4a6 | Errors |
+## Palette and use
+| Name | Official value | Role |
+|---|---|---|
+| Civic Ink | #12302F | Typography, dark identity |
+| Canopy | #2E8B57 | Primary action, vegetation |
+| Monsoon | #2A6FB5 | Links and water-related context |
+| Mist | #F6F8F7 | Main light canvas |
 
-## Typography
-Georgia display: familiar printed-report authority, bundled system serif.
-Trebuchet MS body: open humanist forms, intentionally chosen for dense planning
-work; Arial fallback. Consolas for IDs and units. No network font dependency.
-Scale: 12, 14, 16, 20, 26, 42px. Heading leading 1.15, tracking -0.025em;
-body 1.65. Tabular numerals. Mobile body remains 16px.
+Semantic colors and contrast-safe derivatives live in ui/palette.json, which
+supplies both CSS tokens and Plotly colors. Light: Mist canvas, white working
+surfaces, soft green-gray navigation. Dark: deep ink canvas, layered teal surfaces,
+light green actions and pale blue links; it is not an inverted light palette.
+Primary actions use a darker Canopy derivative for normal-size white-text contrast.
+Brand accents occupy less than 10% of most workspaces. Status uses text plus color.
 
-## Geometry and motion
-Spacing 4,8,12,16,24,32,48,64px. Radius 2/4/6px. One-pixel rules.
-No shadows. Controls 44px minimum height. Motion only on focus/active state,
-120ms; disabled with reduced motion. Split map/profile and ledger layouts,
-not repeated feature-card grids. Mobile stacks controls and chart regions.
+## Typography and geometry
+Outfit Medium (500) body and Semibold (600) headings as specified in the brand sheet.
+Self-hosted variable font from Google Fonts with OFL licence; no runtime font CDN.
+14/16/20/28/40/64px scale, 1.15 heading and 1.65 paragraph leading, -.025em heading
+tracking, tabular numbers. Main hero uses a responsive 40–64px title.
+Spacing: 4/8/12/16/24/32/48/64. Radii: 4/8/12. One-pixel rules.
+Navigation rail 260px expanded / 76px collapsed; main offset transitions with it.
+Mobile below 800px uses an overlay drawer, backdrop, Escape dismissal and focus trap.
+Motion 180ms ease-out for rail/offset only; reduced motion removes it.
 
-## Components
-Primary/secondary/ghost buttons: default, hover, focus, active, disabled, loading.
-Inputs: labelled, focus, invalid, disabled. Navigation: active text + border.
-Evidence tags always include words. Flat metric strips, ruled tables, details
-disclosures, status alerts, empty states and confirmation dialogs.
-`ui/tokens.css` is the common source for the guide and Streamlit styling.
+## Components and interaction
+Native Streamlit form controls retain meanings. Custom shell uses accessible buttons
+and Lucide-style line SVGs (24px, 1.8 stroke) consistently. Active navigation has a
+small line and restrained tint, hover/pressed/focus states and collapsed tooltips.
+Brand button always returns Home. Account footer stays outside the scrollable nav.
+Guest profile is explicit; no login, fake name or unsupported sign-out control.
+Theme choices: System / Light / Dark; localStorage persists preference and compact
+rail state. Browser system theme governs the initial visit; storage failures fall
+back to memory. Theme bootstrap occurs before module content; browser tests verify.
+
+## Information architecture
+| Screen | Decision / first focus | Secondary disclosure |
+|---|---|---|
+| Home | Where should I begin? Four connected planning steps | Preview scope |
+| City | What differs between zones? Map + selected profile | Sources, candidate capacities, method |
+| Investment | What can this budget include? Inputs + cost ledger | Weights, equity floor, review states |
+| Shock | What happens if conditions change? Original plan and stress inputs | Parameter record, layout-only examples |
+| Decision | What supports this choice? Selection, distribution and export | Full contract, assumptions, alternatives |
+
+Before analysis, show the task, input checklist, existing synthetic catalogue or
+comparison structure and a next action. No empty result panel masquerades as a run.
+After analysis, retain inputs and give the ledger greater width. Each chart states
+its unit, purpose and evidence status. Provenance stays visible, details fold away.
 
 ## Voice
-Use: Inspect evidence, Preview allocation, Compare plans, Export decision brief.
-Always say demonstration for fixtures; never call previews solver results.
-Do not imply forecasts, ROI, measured wards or calibrated confidence intervals.
+Say Explore the pilot, Preview allocation, Compare scenarios, Export review brief.
+No claims of actual AI results while the solver is absent. Brief demonstration banner
+plus nearby relevant caveats replaces repeated long warning paragraphs.
 
-## Justified rule breaks
-- Streamlit uses its native accessible widget typography where internal widget
-  rendering cannot inherit the selected font; the shared theme selects the
-  humanist face wherever the framework supports it.
-- Data visualizations may use semantic warning/danger shades for ordered exposure
-  and grayscale alternatives; these encode data, not competing brand accents.
-- Standard Streamlit widget layout uses framework spacing internally; application
-  CSS and guide use shared tokens rather than brittle overrides of private classes.
-- Plotly's built-in chart tools use their standard compact targets; primary map
-  selection has a separate 44px labelled selector and map navigation supports touch.
+## Justified deviations
+- Two official accents are retained because the user's authoritative brand specifies
+  both Canopy and Monsoon; their action and water/link roles are distinct.
+- The official logo contains gradients; supplied artwork is preserved, while no
+  gradient is added to page backgrounds, text or buttons.
+- The logo repeats in navigation and home because consistent official branding is
+  explicitly requested; decorative content imagery is not repeated.
+- An orientation hero is appropriate because the user requests a home explaining the
+  sustainability paradox; it is not a full-screen marketing template.
+- Existing Streamlit/Plotly native icons remain framework-owned; custom navigation
+  uses one line icon vocabulary. Native chart tools have adjacent accessible inputs.
+- The supplied brand typography overrides the earlier Georgia/Trebuchet assumption.
 
-## Review boundary
-All frontend workflows may exercise demonstration fixtures, never disguised
-mathematical optimisation. Model-derived production outputs remain pending approval.
+## Approval and constraints
+The requested review after implementation overrides intermediate style-guide approval.
+Design/tokens/style guide are updated before application changes. Full backend,
+modelling, AWS and authentication remain outside this correction stage.
