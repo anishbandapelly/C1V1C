@@ -24,11 +24,6 @@ PORTFOLIOS = {
     'Equal-spend example': ('A-rainwater_harvesting','B-rainwater_harvesting','C-rainwater_harvesting'),
     'No investment': (),
 }
-# Drawn solely to review comparison layouts, not outputs of any model.
-DISPLAY_OUTCOMES = {
-    'Mixed investment': [0.12, 90, 140], 'Water emphasis': [0.0, 270, 65],
-    'Heat emphasis': [0.0, 0, 220], 'Equal-spend example': [0,270,0], 'No investment': [0,0,0],
-}
 
 def zones():
     with (ROOT/'data/synthetic_test/zone_fixture.csv').open() as f:

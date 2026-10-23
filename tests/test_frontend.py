@@ -47,20 +47,21 @@ def test_contract_rejects_invalid_inputs():
 def test_preview_stale_budget_and_recovery():
     a=submit(app('Investment Optimiser'))
     assert a.session_state['active_preview'].cost_inr==11_200_000
-    choose(a,'number_input','Capital budget · INR crore',.1)
+    choose(a,'selectbox','Display portfolio','Water emphasis')
     assert any('Inputs changed' in x.value for x in a.warning)
-    submit(a)
-    assert any('above the entered budget' in x.value for x in a.error)
+    with pytest.raises(ValueError): preview(request(budget_inr=1_000_000),'Mixed investment')
     choose(a,'selectbox','Display portfolio','No investment')
     submit(a)
     assert a.session_state['active_preview'].cost_inr==0
 
 def test_filter_withholds_unrelated_benefits():
     a=app('Investment Optimiser')
-    choose(a,'multiselect','Interventions to consider',['urban_forest'])
+
+    for key in ['green_roof','rainwater_harvesting','drainage_upgrade']:
+        choose(a,'checkbox',LABELS[key],False)
     submit(a)
     assert a.session_state['active_preview'].selected_ids==('B-urban_forest',)
-    assert any('Outcome fixtures are withheld' in x.value for x in a.warning)
+    assert any('have not been evaluated' in x.value for x in a.caption)
 
 @pytest.mark.parametrize('state',['Loading example','Infeasible example','Service error example','Missing data example'])
 def test_review_states(state):
@@ -108,11 +109,9 @@ def test_home_entry_points_and_guest_contract():
 
 def test_planning_inputs_survive_navigation():
     a=app('Investment Optimiser')
-    choose(a,'number_input','Capital budget · INR crore',3.5)
     choose(a,'selectbox','Display portfolio','Water emphasis')
     a.session_state['page']='Home';a.run()
     a.session_state['page']='Investment Optimiser';a.run()
-    assert next(x for x in a.number_input if x.label=='Capital budget · INR crore').value==3.5
     assert next(x for x in a.selectbox if x.label=='Display portfolio').value=='Water emphasis'
 
 @pytest.mark.parametrize('page',['Climate Shock Lab','Decision Intelligence'])
@@ -129,3 +128,42 @@ def test_theme_palettes_meet_text_contrast_and_chart_remap():
     for p in PALETTES.values():
         for a,b in [('text','bg'),('muted','bg'),('text','surface'),('muted','surface'),('accent-fg','accent'),('link','bg')]:
             lo,hi=sorted([lum(p[a]),lum(p[b])]);assert (hi+.05)/(lo+.05)>=4.5
+
+@pytest.mark.parametrize('text,amount',[('2',20000000),('2.2',22000000),('2.4',24000000),('10.5',105000000),('0',0),('100',1000000000),('0.0000001',1)])
+def test_exact_budget(text,amount):
+    from ui.budget import parse_budget
+    assert parse_budget(text)==amount
+
+@pytest.mark.parametrize('text',['','2,2','-1','101','NaN','1e3','0.00000001'])
+def test_invalid_budget(text):
+    from ui.budget import parse_budget
+    with pytest.raises(ValueError):parse_budget(text)
+
+def test_cleanup_and_normal_scenario():
+    a=submit(app('Investment Optimiser'))
+    assert a.session_state['active_preview'].request.budget_inr==20000000
+    a.session_state['page']='Climate Shock Lab';a.run()
+    choose(a,'selectbox','Disruption','Normal baseline')
+    next(b for b in a.button if b.label=='Preview shock comparison').click().run()
+    assert a.session_state['shock_preview']['factors']['rainfall_multiplier']==1
+    assert not a.json
+    a.session_state['page']='Decision Intelligence';a.run()
+    assert not a.json
+    assert any(e.label=='Sources & assumptions' for e in a.expander)
+
+@pytest.mark.parametrize('mode',['Balanced','Flood-first','Water-first','Heat-first','Equity-first'])
+def test_priority_presets_propagate(mode):
+    from ui.fixtures import WEIGHTS, KEYS
+    a=app('Investment Optimiser')
+    choose(a,'selectbox','Priority mode',mode)
+    submit(a)
+    assert a.session_state['active_preview'].request.weights==dict(zip(KEYS,[v/100 for v in WEIGHTS[mode]]))
+
+def test_incompatible_saved_versions_are_excluded():
+    a=submit(app('Investment Optimiser'))
+    original=a.session_state['active_preview']
+    incompatible=preview(request(baseline_version='different-baseline'),'Water emphasis')
+    a.session_state['history']={original.preview_id:original,incompatible.preview_id:incompatible}
+    a.session_state['page']='Decision Intelligence';a.run()
+    choose(a,'multiselect','Saved previews to compare',[original.preview_id,incompatible.preview_id])
+    assert any('Incompatible' in w.value for w in a.warning)

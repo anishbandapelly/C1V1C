@@ -42,3 +42,12 @@
  :root[data-compact=true] .theme-control select{width:auto;padding:var(--space-2);margin-left:auto;font-size:var(--text-sm)}
  :root[data-compact=true] .nav-tooltip{display:none!important}
 }
+
+/* Header controls are separate from route selection. */
+.brand-row{display:flex;align-items:center;gap:var(--space-1)}
+.brand-home{flex:1;min-width:0;border-radius:0!important}
+.civic-nav .brand-home:hover,.civic-nav .brand-home:active{background:transparent;opacity:.85}
+.civic-nav .brand-home:focus:not(:focus-visible){outline:none;box-shadow:none;background:transparent}
+.rail-tools{border:0;padding:0;flex-shrink:0}.collapse-toggle{width:44px;padding:var(--space-2)}
+:root[data-compact=true] .brand-row{flex-direction:column}
+@media(max-width:799px){:root[data-compact=true] .brand-row{flex-direction:row}}

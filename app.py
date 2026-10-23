@@ -9,7 +9,7 @@ apply_theme()
 # Preserve named planning inputs across routes (Streamlit otherwise cleans up
 # widgets that are absent on a page). Snapshots remain independent copies.
 for key in list(st.session_state):
-    if key in ('budget','mode') or key.startswith(('input_','Balanced-','Flood-first-','Water-first-','Heat-first-','Equity-first-')):
+    if key in ('budget_text','budget_draft','capital_budget','mode') or key.startswith(('input_','Balanced-','Flood-first-','Water-first-','Heat-first-','Equity-first-')):
         st.session_state[key]=st.session_state[key]
 page=render_shell()
 st.warning('Demonstration data — not observed Bengaluru conditions. Models and optimisation have not run.',icon=':material/info:')
