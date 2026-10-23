@@ -1,12 +1,12 @@
-# Implementation status — frontend approval candidate
+# Implementation status â€” frontend approval candidate
 
-Phases 1–3 implemented for review; backend work deliberately awaits user approval.
+Phases 1â€“3 implemented for review; backend work deliberately awaits user approval.
 
 | Area | Status | Evidence |
 |---|---|---|
 | Design direction / tokens / style guide | Implemented | DESIGN.md; light/dark style-guide.html; initial design commit 10f0d80 |
-| Four-section frontend | Implemented with demonstration fixtures | app.py; ui/views.py; frontend commit a3eb707 |
-| Frontend workflow testing | PASS | 17 new tests; 33 total pytest tests; real Edge browser navigation and export |
+| Home + four-section frontend | Implemented with demonstration fixtures | app.py; ui/views.py; frontend commit a3eb707 |
+| Frontend workflow testing | PASS | 23 frontend tests; 39 total pytest tests; real Edge browser navigation and export |
 | Anti-Slop review | PASS self-audit | docs/DESIGN_AUDIT.md; screenshots and contrast measurements |
 | Data engine / validated pilot datasets | Pending approval | Source leads only; synthetic input explicitly labelled |
 | Physical models / MILP / equity | Pending approval | No solver or model invoked by frontend |

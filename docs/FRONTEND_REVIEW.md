@@ -1,4 +1,4 @@
-# Frontend approval build — 23 October 2026
+# Frontend approval build — 24 October 2026
 
 ## Scope and review gate
 Phases 1–3 only. The user explicitly requires frontend approval before full backend
@@ -16,10 +16,12 @@ From the repository root:
 ```powershell
 python -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements-lock.txt
-.venv\Scripts\python.exe -m streamlit run app.py --server.port 8501
+.venv\Scripts\python.exe -m streamlit run app.py --server.port 8503
 .venv\Scripts\python.exe -m pytest -q
 ```
 
+0. Home: use the official brand link to return home. Collapse the rail, open the Guest
+   profile, switch light/dark/system appearance, and reload to check persistence.
 1. City Intelligence: select all six layers, pan/zoom the map, switch A/B/C profiles,
    inspect candidates and the source register; turn street tiles off for offline use.
 2. Investment Optimiser: set budget and priorities, inspect weights, filter types,
@@ -59,19 +61,19 @@ Pending acceptance: every engine/data/scientific/AWS/deployment P0 remains pendi
 Frontend test passes must never be reported as proof those modules work.
 
 ## Verification
-- `python -m pytest -q`: 33 passing tests (16 original handoff/fixture tests and
-  17 frontend tests). Includes all pages, zero budget, invalid weights, unsupported
+- `python -m pytest -q`: 39 passing tests (16 original handoff/fixture tests and
+  23 frontend tests). Includes all pages, zero budget, invalid weights, unsupported
   equity floor, insufficient budget, intervention filter honesty, stale snapshots,
   explicit failure/loading states, profile selection and all shock records.
-- `scripts/browser_review.cjs`: real Microsoft Edge/Chromium navigation through
+- `scripts/redesign_review.cjs`: real Microsoft Edge/Chromium navigation through
   all sections, preview submission, shock submission and actual JSON download.
   No JavaScript page errors. Measured viewport/body widths 320/320, 375/375,
   768/768. Primary export target height 44px. Screenshots inspected.
 - The script uses Playwright from `C1V1C_NODE_MODULES`; set that variable to the
   node_modules directory containing Playwright. Edge must be installed, or change
   the browser channel to an installed Chromium distribution.
-- Style guide: 84 rendered token entries across both themes; semantic controls,
-  validation, disabled/loading, source disclosure and native dialog specimens.
+- Style guide: official palette, self-hosted Outfit, original logos and both theme specimens.
+- Browser accessibility: axe-core 4.14, WCAG A/AA scans; incomplete checks remain manual review items.
 - Manual audit and contrast measurements: `docs/DESIGN_AUDIT.md`.
 
 ## Known frontend limits
@@ -82,3 +84,9 @@ behaviour; this is not a formal screen-reader or WCAG certification. A verified
 boundary layer and site-level geometry must be added after the data validation gate.
 
 Approval requested for visual direction, navigation and interaction flow only.
+
+## Brand redesign implementation
+
+ui/shell.py/js/css implements navigation and the presentation-only ProfileView contract. ui/workspace.css styles native controls; ui/theme.py applies persistent system-aware appearance. ui/views.py preserves existing fixture workflows while adding home and useful pre-analysis states. Supplied logos are copied unchanged into static/brand; Outfit is self-hosted with its licence. No authentication backend is implied by Guest mode.
+
+Final redesigned browser run: 133 checks, 58 screenshots, 17 WCAG A/AA axe scans with zero violations, and zero JavaScript page errors. Tested 320, 375, 768, 1024, 1280 and 1440px viewports. Automated incomplete checks are retained for manual review.

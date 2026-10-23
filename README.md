@@ -2,7 +2,7 @@
 
 **Balancing the Future of Cities.** A research-grounded urban sustainability decision engine for a 24-hour hackathon.
 
-> **Current status:** Frontend approval build (Phases 1–3). Run `streamlit run app.py` to inspect all four sections. Demonstration data is labelled throughout. The scientific engine, MILP, validated datasets and AWS integrations remain pending frontend approval. See [frontend review and launch instructions](docs/FRONTEND_REVIEW.md) and [design audit](docs/DESIGN_AUDIT.md).
+> **Current status:** Frontend approval build (Phases 1–3). Brand-aligned home, collapsible navigation, guest profile and light/dark themes are ready for review. Run `streamlit run app.py --server.port 8503` to inspect home and all four sections. Demonstration data is labelled throughout. The scientific engine, MILP, validated datasets and AWS integrations remain pending frontend approval. See [frontend review and launch instructions](docs/FRONTEND_REVIEW.md) and [design audit](docs/DESIGN_AUDIT.md).
 
 The historical handoff notes below describe the original baseline; they are retained as project context.
 
@@ -47,7 +47,7 @@ pytest -q
 streamlit run app.py
 ```
 
-At present, `pytest` exercises the **reference synthetic fixtures only**. Passing those tests does not mean the application is complete. Codex must implement and test the five official modules, then report the true completion state.
+At present, `pytest` exercises the **reference synthetic fixtures, contracts and frontend workflows**. Passing those tests does not mean the application is complete. Codex must implement and test the five official modules, then report the true completion state.
 
 ## Data integrity
 - `data/raw/`: downloaded original datasets; not committed by default.
