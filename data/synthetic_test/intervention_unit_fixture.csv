@@ -1,0 +1,5 @@
+intervention_type,capex_inr,roof_m2,land_m2,tank_capacity_m3,irrigation_m3_month,runoff_retention_depth_mm,drainage_capacity_delta_m3_s,evidence_class
+green_roof,3000000,250,0,0,0,15,0,synthetic
+urban_forest,2000000,0,300,0,8,0,0,synthetic
+rainwater_harvesting,1200000,200,0,20,0,0,0,synthetic
+drainage_upgrade,5000000,0,0,0,0,0,0.12,synthetic

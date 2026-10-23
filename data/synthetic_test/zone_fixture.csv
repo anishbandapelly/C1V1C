@@ -1,0 +1,4 @@
+zone_id,label,area_ha,population,runoff_coefficient,drainage_capacity_m3_s,suitable_roof_m2,plantable_land_m2,heat_index,evidence_class
+A,rain_stress,10,4000,0.85,0.85,1500,1000,0.72,synthetic
+B,heat_stress,8,6500,0.7,0.9,2000,650,0.81,synthetic
+C,water_stress,12,3500,0.55,1.1,1800,1800,0.58,synthetic

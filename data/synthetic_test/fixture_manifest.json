@@ -1,0 +1,22 @@
+{
+  "status": "synthetic_only_not_city_data",
+  "origin": "C1V1C_Tulabhara_AI_Complete_Master_Development_Plan.docx",
+  "source_tables": [
+    7,
+    9,
+    12,
+    22
+  ],
+  "purpose": "data-contract and numerical regression tests; not forecasts or verified local intervention estimates",
+  "version": "synthetic_v1",
+  "geography": "illustrative three zones; unverified Yelahanka correspondence",
+  "units": {
+    "area_ha": "hectares",
+    "population": "persons",
+    "drainage_capacity_m3_s": "m³/s",
+    "suitable_roof_m2": "m²",
+    "capex_inr": "INR",
+    "heat_index": "dimensionless synthetic indicator"
+  },
+  "missing": "real zone boundaries, measured climate, verified intervention coefficients, vulnerability profiles and implementation sites"
+}

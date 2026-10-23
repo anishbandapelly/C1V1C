@@ -1,0 +1,5 @@
+scenario_id,rainfall_multiplier,irrigation_factor,tree_cooling_factor,budget_multiplier,description,evidence_class
+normal,1.0,1.0,1.0,1.0,baseline stress-test defaults,synthetic
+extreme_rain,1.3,1.0,1.0,1.0,design intensity multiplied 1.30,synthetic
+drought,0.6,1.0,0.7,1.0,rainfall factor 0.60 and tree cooling factor 0.70,synthetic
+budget_cut,1.0,1.0,1.0,0.7,capital envelope 0.70 of baseline,synthetic

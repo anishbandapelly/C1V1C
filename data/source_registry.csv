@@ -1,0 +1,10 @@
+source_id,category,source_name,source_url,intended_use,spatial_limit_or_caveat,verification_status
+PS,requirements,Original Sustainable Development PS,docs/Original_Sustainable_Development_PS.docx,official mandatory scope,not a numerical dataset,verified_local_copy
+R1,local_flood_context,ATREE Bengaluru flood strategy,https://www.atree.org/,flood risk and Yelahanka catchment context,not automatically extractable ward measurements,to_verify
+CHIRPS,climate,CHIRPS rainfall dataset,https://www.chc.ucsb.edu/data/chirps,rainfall context and scenario baseline,gridded rainfall cannot be claimed ward-scale without caveat,not_downloaded
+WORLD_COVER,land_use,ESA WorldCover,https://esa-worldcover.org/,land-use and imperviousness proxy,source year and urban accuracy need verification,not_downloaded
+OPEN_BUILDINGS,rooftops,Google Open Buildings,https://sites.research.google/open-buildings/,rooftop footprint candidate areas,footprint not structural suitability,not_downloaded
+WORLDPOP,population,WorldPop,https://www.worldpop.org/,population estimates and exposure,modelled estimates not observed census,not_downloaded
+NASA_POWER,climate,NASA POWER,https://power.larc.nasa.gov/,temperature and precipitation context,coarse location resolution,not_downloaded
+LOCAL_COSTS,costs,Local sources to be selected,,capex and maintenance estimates,no locally verified values available,needs_source
+INTERVENTION_FACTORS,effectiveness,Selected research and validated assumptions,docs/research_evidence.md,impact coefficients by site and scenario,no validated Bengaluru coefficient matrix supplied,needs_source

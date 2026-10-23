@@ -1,0 +1,13 @@
+{
+  "baseline_version": "NOT_SET",
+  "data_mode": "synthetic_demonstration_or_mixed_evidence_or_observed_data_pilot",
+  "model_version": "not_implemented",
+  "created_at_utc": null,
+  "geography": "NOT_VERIFIED",
+  "coordinate_reference_system": null,
+  "time_horizon": null,
+  "source_ids": [],
+  "file_sha256": {},
+  "known_gaps": ["Pilot measurements have not been verified"],
+  "verified_by": null
+}

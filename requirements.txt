@@ -1,0 +1,11 @@
+# Bootstrap compatible ranges, NOT a verified final lock. Codex must install,
+# run all application tests, then create a validated lock for the target Python.
+# Target interpreter: Python 3.11; support other versions only after testing.
+pydantic>=2,<3
+pandas>=2,<3
+numpy>=1.26,<3
+PuLP>=2.8,<4
+streamlit>=1.40,<2
+plotly>=5,<7
+boto3>=1.34
+pytest>=8,<10
