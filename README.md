@@ -2,7 +2,12 @@
 
 **Balancing the Future of Cities.** A research-grounded urban sustainability decision engine for a 24-hour hackathon.
 
-> **Current status:** Frontend approval build (Phases 1–3). Brand-aligned home, collapsible navigation, guest profile and light/dark themes are ready for review. Run `streamlit run app.py --server.port 8503` to inspect home and all four sections. Demonstration data is labelled throughout. The scientific engine, MILP, validated datasets and AWS integrations remain pending frontend approval. See [frontend review and launch instructions](docs/FRONTEND_REVIEW.md) and [design audit](docs/DESIGN_AUDIT.md).
+> **Current status:** Frontend approval build (Phases 1–3). Brand-aligned home, collapsible navigation, guest profile and light/dark themes are ready for review. Run `streamlit run app.py` to inspect home and all four sections. Demonstration data is labelled throughout. The scientific engine, MILP, validated datasets and AWS integrations remain pending frontend approval. See [frontend review and launch instructions](docs/FRONTEND_REVIEW.md) and [design audit](docs/DESIGN_AUDIT.md).
+
+Correction round 2 adds the exact budget editor, intervention request rows,
+streamlined scenario/decision layouts and a source-document compliance matrix.
+See [round-2 verification](docs/FRONTEND_ROUND2_REVIEW.md) and
+[frontend requirements audit](docs/FRONTEND_REQUIREMENTS_AUDIT.md).
 
 The historical handoff notes below describe the original baseline; they are retained as project context.
 

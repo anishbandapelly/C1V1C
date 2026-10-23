@@ -75,3 +75,9 @@ Automated accessibility checks cannot evaluate every chart feature. Axe incomple
 
 ## Final self-critique
 The work now reads as a single civic planning application: the home introduces competing priorities, the map explains where to inspect, and pre-analysis pages explain what a preview can and cannot establish. Guest and demonstration labels remain explicit. Long scientific caveats remain a comprehension risk; they are grouped near relevant decisions. Review with actual planners and screen-reader users remains valuable. The scientific engine and production deployment remain pending approval.
+
+## Correction round 2 — audit rerun
+
+The same 30-item checklist above was reviewed against this correction. All six categories remain 5/5 (100/100 self-assessment), with the previously documented official-brand exceptions. New checks: budget uses one border/focus ring and dot-decimal text editing; interventions use selected/excluded text in addition to checkmarks; full-width sequential results replace unequal columns; standalone raw state and static environmental specimens are removed; priorities are a concise table; sources are a disclosure. Headings use h2 below page h1. Native chart controls retain the accessible-control exception.
+
+Priority corrections: (1) exact, locale-independent budget input with no native stepper chrome; (2) remove misleading and developer-facing content while retaining saved metadata/export; (3) reduce wasted columns and keep sidebar toggle inside its header. The budget component sizes to its content so mobile validation text is not clipped. New test evidence and screenshots are recorded in FRONTEND_ROUND2_REVIEW.md. No claim of independent design review or full WCAG certification is made.

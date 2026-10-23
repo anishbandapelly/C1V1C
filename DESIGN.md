@@ -86,3 +86,5 @@ plus nearby relevant caveats replaces repeated long warning paragraphs.
 The requested review after implementation overrides intermediate style-guide approval.
 Design/tokens/style guide are updated before application changes. Full backend,
 modelling, AWS and authentication remain outside this correction stage.
+## Correction round 2
+Keep the established civic tool direction. Use sequential, full-width results after compact input groups, rather than unequal long columns. Budget editing uses a text-based decimal control with one border, no steppers, Enter/blur commit and Escape restore; conversion uses Decimal and whole INR precision. Intervention rows distinguish requested inclusion from unverified suitability, with synthetic resource/cost context. Remove raw JSON panels and static shock specimens; retain exports and versioned contracts. Sources and assumptions are collapsed, priorities are an aligned full-width breakdown. The header holds the brand and icon-only navigation toggle; mouse activation does not paint a brand box.

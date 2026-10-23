@@ -6,7 +6,7 @@ Phases 1â€“3 implemented for review; backend work deliberately awaits user 
 |---|---|---|
 | Design direction / tokens / style guide | Implemented | DESIGN.md; light/dark style-guide.html; initial design commit 10f0d80 |
 | Home + four-section frontend | Implemented with demonstration fixtures | app.py; ui/views.py; frontend commit a3eb707 |
-| Frontend workflow testing | PASS | 23 frontend tests; 39 total pytest tests; real Edge browser navigation and export |
+| Frontend workflow testing | PASS | 60 pytest tests; 141 browser/interaction assertions; 162 final review screenshots |
 | Anti-Slop review | PASS self-audit | docs/DESIGN_AUDIT.md; screenshots and contrast measurements |
 | Data engine / validated pilot datasets | Pending approval | Source leads only; synthetic input explicitly labelled |
 | Physical models / MILP / equity | Pending approval | No solver or model invoked by frontend |
@@ -17,4 +17,6 @@ Phases 1â€“3 implemented for review; backend work deliberately awaits user 
 | Deployment | Local frontend preview running | Full production release not attempted before P0 and frontend approval |
 
 See docs/FRONTEND_REVIEW.md for commands, coverage, limitations and handoff contracts.
+See docs/FRONTEND_ROUND2_REVIEW.md and docs/FRONTEND_REQUIREMENTS_AUDIT.md for the
+second correction round and the PS/master-plan compliance matrix.
 Passing frontend and reference tests does not certify the five production modules.
