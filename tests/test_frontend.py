@@ -1,169 +1,261 @@
-"""Frontend review tests; these do not certify the unimplemented engine."""
-import pytest
+"""Frontend integration tests: real UI controls drive real engine runs (synthetic baseline unless stated)."""
 from pathlib import Path
-from pydantic import ValidationError
-from streamlit.testing.v1 import AppTest
-from ui.contracts import ScenarioRequest
-from ui.fixtures import preview, LABELS, PORTFOLIOS
 
-def request(**changes):
-    values=dict(budget_inr=20_000_000,weights=dict(F=.25,W=.2,H=.2,G=.1,Equity=.15,LCC=.1),allowed_interventions=tuple(LABELS))
-    return ScenarioRequest(**(values|changes))
+import pytest
+import streamlit as st
+from streamlit.testing.v1 import AppTest
+
+from conftest import requires_real
+from ui.backend import KEYS, LABELS
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+@pytest.fixture(autouse=True)
+def synthetic_ui(synthetic_dir, monkeypatch):
+    monkeypatch.setenv("C1V1C_CURATED_DIR", str(synthetic_dir.parent))
+    monkeypatch.setenv("C1V1C_BASELINE_VERSION", synthetic_dir.name)
+    st.cache_resource.clear()
+    from c1v1c.baseline import _load
+    _load.cache_clear()
+    yield
+    st.cache_resource.clear()
+
 
 def app(page='City Intelligence'):
-    a=AppTest.from_file(Path(__file__).resolve().parents[1]/'app.py',default_timeout=30).run()
-    a.session_state['page']=page
+    a = AppTest.from_file(str(ROOT / 'app.py'), default_timeout=120).run()
+    a.session_state['page'] = page
     a.run()
-    assert not a.exception
+    assert not a.exception, a.exception
     return a
 
-def choose(a,kind,label,value):
-    next(x for x in getattr(a,kind) if x.label==label).set_value(value)
-    return a.run()
+
+def choose(a, kind, label, value):
+    next(x for x in getattr(a, kind) if x.label == label).set_value(value)
+    a.run()
+    assert not a.exception, a.exception
+    return a
+
 
 def submit(a):
-    next(x for x in a.button if x.label=='Preview allocation').click().run()
-    assert not a.exception
+    next(x for x in a.button if x.label == 'Run optimisation').click().run()
+    assert not a.exception, a.exception
     return a
 
-@pytest.mark.parametrize('page',['Home','City Intelligence','Investment Optimiser','Climate Shock Lab','Decision Intelligence'])
-def test_navigation_and_honesty(page):
-    a=app(page)
-    assert any('Demonstration data' in x.value for x in a.warning)
 
-def test_snapshot_cost_and_immutability():
-    s=preview(request(),'Mixed investment')
-    assert s.cost_inr==11_200_000 and s.solver_status=='not_run'
-    assert s.preview_id==preview(request(),'Mixed investment').preview_id
-    with pytest.raises(ValidationError):s.cost_inr=0
-    assert preview(request(allowed_interventions=()),'Mixed investment').selected_ids==()
-    with pytest.raises(ValueError):preview(request(budget_inr=0),'Mixed investment')
+def set_budget(a, text):
+    """Drive the custom budget component through its own state, which then flows through parse_budget."""
+    a.session_state['capital_budget'] = {'value': text}
+    a.run()
+    assert not a.exception, a.exception
+    return a
 
-def test_contract_rejects_invalid_inputs():
-    with pytest.raises(ValidationError):request(budget_inr=-1)
-    with pytest.raises(ValidationError):request(weights=dict(F=1))
-    with pytest.raises(ValidationError):request(equity_floor=2)
 
-def test_preview_stale_budget_and_recovery():
-    a=submit(app('Investment Optimiser'))
-    assert a.session_state['active_preview'].cost_inr==11_200_000
-    choose(a,'selectbox','Display portfolio','Water emphasis')
+def shock(a, kind):
+    a.session_state['page'] = 'Climate Shock Lab'
+    a.run()
+    choose(a, 'selectbox', 'Disruption', kind)
+    next(b for b in a.button if b.label == 'Run shock comparison').click().run()
+    assert not a.exception, a.exception
+    return a
+
+
+@pytest.mark.parametrize('page', ['Home', 'City Intelligence', 'Investment Optimiser', 'Climate Shock Lab', 'Decision Intelligence'])
+def test_every_page_states_its_data_mode(page):
+    a = app(page)
+    assert any('synthetic demonstration' in x.value.lower() for x in a.info)
+
+
+def test_optimiser_runs_the_real_solver_and_verifies():
+    a = submit(app('Investment Optimiser'))
+    run = a.session_state['active_run']
+    assert run.solver_status == 'optimal' and run.run_id.startswith('run-')
+    assert run.allocated_inr <= run.budget_available_inr and all(run.verification.values())
+    assert any('Optimal (CBC, proven)' in c.value for c in a.caption)
+    assert any(m.label == 'Capital · INR crore' for m in a.metric)
+    assert run.run_id in a.session_state['history']
+
+
+def test_budget_input_conversion_reaches_the_solver():
+    a = app('Investment Optimiser')
+    set_budget(a, '0.5')
+    submit(a)
+    run = a.session_state['active_run']
+    assert run.request.budget_inr == 5_000_000 and run.allocated_inr <= 5_000_000
+
+
+def test_inputs_changed_warning_and_zero_budget():
+    a = submit(app('Investment Optimiser'))
+    choose(a, 'selectbox', 'Priority mode', 'Water-first')
     assert any('Inputs changed' in x.value for x in a.warning)
-    with pytest.raises(ValueError): preview(request(budget_inr=1_000_000),'Mixed investment')
-    choose(a,'selectbox','Display portfolio','No investment')
+    set_budget(a, '0')
     submit(a)
-    assert a.session_state['active_preview'].cost_inr==0
+    assert a.session_state['active_run'].selected_candidate_counts == {}
 
-def test_filter_withholds_unrelated_benefits():
-    a=app('Investment Optimiser')
 
-    for key in ['green_roof','rainwater_harvesting','drainage_upgrade']:
-        choose(a,'checkbox',LABELS[key],False)
+def test_intervention_filter_limits_the_solver():
+    a = app('Investment Optimiser')
+    for key in ['green_roof', 'rainwater_harvesting', 'drainage_upgrade']:
+        choose(a, 'checkbox', LABELS[key], False)
     submit(a)
-    assert a.session_state['active_preview'].selected_ids==('B-urban_forest',)
-    assert any('have not been evaluated' in x.value for x in a.caption)
+    run = a.session_state['active_run']
+    assert run.selected_candidate_counts and all(k.endswith('urban_forest') for k in run.selected_candidate_counts)
 
-@pytest.mark.parametrize('state',['Loading example','Infeasible example','Service error example','Missing data example'])
-def test_review_states(state):
-    a=app('Investment Optimiser')
-    choose(a,'selectbox','Review state',state)
-    assert not a.exception
 
-def test_weights_and_equity_validation():
-    a=app('Investment Optimiser')
-    choose(a,'number_input','Flood weight · %',40)
+def test_weights_must_total_100_and_infeasible_floor_is_reported():
+    a = app('Investment Optimiser')
+    choose(a, 'number_input', 'Flood weight · %', 40)
     submit(a)
     assert any('100%' in x.value for x in a.error)
-    choose(a,'number_input','Flood weight · %',25)
-    choose(a,'slider','Priority-zone benefit floor · normalised',.5)
+    choose(a, 'number_input', 'Flood weight · %', 25)
+    set_budget(a, '0.1')
+    choose(a, 'slider', 'Priority-zone benefit floor · normalised', 0.5)
     submit(a)
-    assert any('cannot verify a benefit floor' in x.value for x in a.error)
+    run = a.session_state['active_run']
+    assert run.solver_status == 'infeasible' and run.outcome is None
+    assert any('No feasible portfolio' in x.value for x in a.error)
 
-@pytest.mark.parametrize('shock',['Extreme rainfall','Drought','Sudden budget cut'])
-def test_shocks_preserve_original_selection(shock):
-    a=submit(app('Investment Optimiser'))
-    original=a.session_state['active_preview']
-    a.session_state['page']='Climate Shock Lab'
+
+@pytest.mark.parametrize('kind', ['Extreme rainfall', 'Drought', 'Sudden budget cut', 'Normal baseline'])
+def test_shocks_keep_original_and_reoptimise(kind):
+    a = submit(app('Investment Optimiser'))
+    original = a.session_state['active_run']
+    shock(a, kind)
+    comp = a.session_state['shock_results'][a.session_state['active_shock']]
+    assert comp.original_run_id == original.run_id
+    assert comp.b_original_under_shock.counts == original.selected_candidate_counts
+    assert a.session_state['active_run'] == original
+    assert comp.c_reoptimised.run_id in a.session_state['history']
+    assert any('comparison' in h.value for h in a.header)
+    a.session_state['page'] = 'Decision Intelligence'
     a.run()
-    choose(a,'selectbox','Disruption',shock)
-    next(b for b in a.button if b.label=='Preview shock comparison').click().run()
     assert not a.exception
-    assert a.session_state['shock_preview']['ids']==list(original.selected_ids)
-    assert a.session_state['active_preview']==original
-    a.session_state['page']='Decision Intelligence'
+    assert len(a.get('download_button')) == 2
+
+
+def test_decision_intelligence_is_grounded_and_has_sources():
+    a = submit(app('Investment Optimiser'))
+    shock(a, 'Sudden budget cut')
+    a.session_state['page'] = 'Decision Intelligence'
     a.run()
     assert not a.exception
-    assert len(a.get('download_button'))==2
+    assert any('deterministic explainer' in c.value for c in a.caption)
+    assert any(e.label == 'Sources & assumptions' for e in a.expander)
+    assert any(e.label == 'Under climate shocks' for e in a.expander)
+    assert not a.json  # no raw developer dumps in the main UI
+
 
 def test_zone_selection_updates_profile():
-    a=app()
-    choose(a,'selectbox','Neighbourhood fixture','B')
-    assert any(x.value=='6,500' for x in a.metric)
+    a = app()
+    choose(a, 'selectbox', 'Pilot ward', 'ZB')
+    assert any(x.value == '6,500' for x in a.metric)  # synthetic fixture population for zone B
+
 
 def test_home_entry_points_and_guest_contract():
     from ui.shell import ProfileView
-    a=app('Home')
-    next(x for x in a.button if x.label=='Explore the pilot').click().run()
-    assert a.session_state['page']=='City Intelligence'
-    assert not ProfileView().authenticated and ProfileView().display_name=='Guest workspace'
+    a = app('Home')
+    next(x for x in a.button if x.label == 'Explore the pilot').click().run()
+    assert a.session_state['page'] == 'City Intelligence'
+    assert not ProfileView().authenticated and ProfileView().display_name == 'Guest workspace'
+
 
 def test_planning_inputs_survive_navigation():
-    a=app('Investment Optimiser')
-    choose(a,'selectbox','Display portfolio','Water emphasis')
-    a.session_state['page']='Home';a.run()
-    a.session_state['page']='Investment Optimiser';a.run()
-    assert next(x for x in a.selectbox if x.label=='Display portfolio').value=='Water emphasis'
+    a = app('Investment Optimiser')
+    choose(a, 'selectbox', 'Priority mode', 'Water-first')
+    a.session_state['page'] = 'Home'
+    a.run()
+    a.session_state['page'] = 'Investment Optimiser'
+    a.run()
+    assert next(x for x in a.selectbox if x.label == 'Priority mode').value == 'Water-first'
 
-@pytest.mark.parametrize('page',['Climate Shock Lab','Decision Intelligence'])
+
+@pytest.mark.parametrize('page', ['Climate Shock Lab', 'Decision Intelligence'])
 def test_preanalysis_has_a_working_next_action(page):
-    a=app(page)
+    a = app(page)
     a.button[0].click().run()
-    assert a.session_state['page']=='Investment Optimiser'
+    assert a.session_state['page'] == 'Investment Optimiser'
+
+
+@pytest.mark.parametrize('mode', ['Balanced', 'Flood-first', 'Water-first', 'Heat-first', 'Equity-first'])
+def test_priority_presets_propagate(mode):
+    from c1v1c.catalogue import load_parameters
+    a = app('Investment Optimiser')
+    choose(a, 'selectbox', 'Priority mode', mode)
+    submit(a)
+    run = a.session_state['active_run']
+    assert run.request.weights == dict(zip(KEYS, load_parameters().modes[mode])) and run.request.mode == mode
+
+
+def test_incompatible_saved_versions_are_excluded():
+    a = submit(app('Investment Optimiser'))
+    original = a.session_state['active_run']
+    other = original.model_copy(update={'run_id': 'run-other', 'baseline_version': 'different-baseline'})
+    a.session_state['history'] = {original.run_id: original, other.run_id: other}
+    a.session_state['page'] = 'Decision Intelligence'
+    a.run()
+    choose(a, 'multiselect', 'Saved runs to compare', [original.run_id, other.run_id])
+    assert any('Incompatible' in w.value for w in a.warning)
+
 
 def test_theme_palettes_meet_text_contrast_and_chart_remap():
     from ui.theme import PALETTES
+
     def lum(h):
-        c=[int(h[i:i+2],16)/255 for i in (1,3,5)]
-        return sum((v/12.92 if v<=.04045 else ((v+.055)/1.055)**2.4)*w for v,w in zip(c,[.2126,.7152,.0722]))
+        c = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+        return sum((v / 12.92 if v <= .04045 else ((v + .055) / 1.055) ** 2.4) * w for v, w in zip(c, [.2126, .7152, .0722]))
     for p in PALETTES.values():
-        for a,b in [('text','bg'),('muted','bg'),('text','surface'),('muted','surface'),('accent-fg','accent'),('link','bg')]:
-            lo,hi=sorted([lum(p[a]),lum(p[b])]);assert (hi+.05)/(lo+.05)>=4.5
+        for x, y in [('text', 'bg'), ('muted', 'bg'), ('text', 'surface'), ('muted', 'surface'), ('accent-fg', 'accent'), ('link', 'bg')]:
+            lo, hi = sorted([lum(p[x]), lum(p[y])])
+            assert (hi + .05) / (lo + .05) >= 4.5
 
-@pytest.mark.parametrize('text,amount',[('2',20000000),('2.2',22000000),('2.4',24000000),('10.5',105000000),('0',0),('100',1000000000),('0.0000001',1)])
-def test_exact_budget(text,amount):
+
+@pytest.mark.parametrize('text,amount', [('2', 20000000), ('2.2', 22000000), ('2.4', 24000000), ('10.5', 105000000), ('0', 0),
+                                         ('100', 1000000000), ('0.0000001', 1)])
+def test_exact_budget(text, amount):
     from ui.budget import parse_budget
-    assert parse_budget(text)==amount
+    assert parse_budget(text) == amount
 
-@pytest.mark.parametrize('text',['','2,2','-1','101','NaN','1e3','0.00000001'])
+
+@pytest.mark.parametrize('text', ['', '2,2', '-1', '101', 'NaN', '1e3', '0.00000001'])
 def test_invalid_budget(text):
     from ui.budget import parse_budget
-    with pytest.raises(ValueError):parse_budget(text)
+    with pytest.raises(ValueError):
+        parse_budget(text)
 
-def test_cleanup_and_normal_scenario():
-    a=submit(app('Investment Optimiser'))
-    assert a.session_state['active_preview'].request.budget_inr==20000000
-    a.session_state['page']='Climate Shock Lab';a.run()
-    choose(a,'selectbox','Disruption','Normal baseline')
-    next(b for b in a.button if b.label=='Preview shock comparison').click().run()
-    assert a.session_state['shock_preview']['factors']['rainfall_multiplier']==1
-    assert not a.json
-    a.session_state['page']='Decision Intelligence';a.run()
-    assert not a.json
-    assert any(e.label=='Sources & assumptions' for e in a.expander)
 
-@pytest.mark.parametrize('mode',['Balanced','Flood-first','Water-first','Heat-first','Equity-first'])
-def test_priority_presets_propagate(mode):
-    from ui.fixtures import WEIGHTS, KEYS
-    a=app('Investment Optimiser')
-    choose(a,'selectbox','Priority mode',mode)
+def test_missing_baseline_shows_honest_error(monkeypatch, tmp_path):
+    monkeypatch.setenv('C1V1C_CURATED_DIR', str(tmp_path / 'nowhere'))
+    st.cache_resource.clear()
+    a = AppTest.from_file(str(ROOT / 'app.py'), default_timeout=60).run()
+    a.session_state['page'] = 'Investment Optimiser'
+    a.run()
+    assert not a.exception
+    assert any('could not load its Bengaluru baseline' in e.value for e in a.error)
+
+
+@requires_real
+def test_end_to_end_on_real_bengaluru_baseline(monkeypatch):
+    """Hero -> City -> Optimiser -> Shock Lab -> Decision Intelligence on the real curated baseline."""
+    monkeypatch.setenv('C1V1C_CURATED_DIR', str(ROOT / 'data' / 'curated'))
+    monkeypatch.setenv('C1V1C_BASELINE_VERSION', 'bengaluru_pilot_v1')
+    st.cache_resource.clear()
+    from c1v1c.baseline import _load
+    _load.cache_clear()
+    a = app('Home')
+    assert any('mixed-evidence pilot' in x.value.lower() for x in a.info)
+    next(x for x in a.button if x.label == 'Explore the pilot').click().run()
+    assert a.session_state['page'] == 'City Intelligence' and not a.exception
+    assert all('Yelahanka' in o for o in a.selectbox(key='input_zone').options)
+    a.session_state['page'] = 'Investment Optimiser'
+    a.run()
     submit(a)
-    assert a.session_state['active_preview'].request.weights==dict(zip(KEYS,[v/100 for v in WEIGHTS[mode]]))
-
-def test_incompatible_saved_versions_are_excluded():
-    a=submit(app('Investment Optimiser'))
-    original=a.session_state['active_preview']
-    incompatible=preview(request(baseline_version='different-baseline'),'Water emphasis')
-    a.session_state['history']={original.preview_id:original,incompatible.preview_id:incompatible}
-    a.session_state['page']='Decision Intelligence';a.run()
-    choose(a,'multiselect','Saved previews to compare',[original.preview_id,incompatible.preview_id])
-    assert any('Incompatible' in w.value for w in a.warning)
+    run = a.session_state['active_run']
+    assert run.solver_status == 'optimal' and run.data_mode.value == 'mixed-evidence pilot'
+    assert run.baseline_version == 'bengaluru_pilot_v1'
+    for kind in ('Extreme rainfall', 'Drought', 'Sudden budget cut'):
+        shock(a, kind)
+    a.session_state['page'] = 'Decision Intelligence'
+    a.run()
+    assert not a.exception
+    assert run.run_id in a.session_state['history'] and a.session_state['active_run'].run_id == run.run_id
+    assert any(run.run_id in str(o) for o in a.selectbox[0].options)
