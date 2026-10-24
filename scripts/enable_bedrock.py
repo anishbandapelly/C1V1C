@@ -16,8 +16,10 @@ from botocore.exceptions import BotoCoreError, ClientError
 
 ROOT = Path(__file__).resolve().parents[1]
 CANDIDATES = [
-    "global.anthropic.claude-haiku-4-5-20251001-v1:0",   # cheapest adequate narrator first
-    "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "global.anthropic.claude-haiku-5-5",                 # current, cheapest adequate narrator first
+    "global.anthropic.claude-sonnet-5-5",
+    "in.anthropic.claude-haiku-4-5-20251001-v1:0",       # in-country (India) profile fallback
+    "global.anthropic.claude-haiku-4-5-20251001-v1:0",
 ]
 
 
