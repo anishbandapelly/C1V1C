@@ -38,6 +38,12 @@ class Engine:
         self.specs = load_interventions()
         self.scenarios = load_scenarios()
         self.catalog_version = catalog_version()
+        if s3 is None and not self.settings.offline_mode and self.settings.s3_bucket:
+            from c1v1c.aws.s3 import FailoverS3, S3Store, S3Unavailable
+            try:  # online: mirror every immutable run to S3; failures are recorded, never fatal
+                s3 = FailoverS3(S3Store(self.settings))
+            except S3Unavailable:
+                s3 = None
         self.store = RunStore(self.settings, s3)
         self.all_candidates = build_candidates(list(self.baseline.zones), self.specs, self.params)
         self.scales: Scales = reference_scales(self.baseline, self.all_candidates, self.specs, self.params, self.scenarios["normal"])
@@ -98,7 +104,9 @@ class Engine:
         run_id = "run-" + ih[:16]
         if use_cache:
             try:
-                return self.store.load("runs", run_id, RunResult)
+                cached = self.store.load("runs", run_id, RunResult)
+                self.store.mirror("runs", run_id)
+                return cached
             except KeyError:
                 pass
         scenario = self.scenario_for(request)
@@ -181,6 +189,7 @@ class Engine:
         if fresh != old:
             diff = sorted(k for k in fresh if fresh[k] != old.get(k))
             raise RuntimeError(f"run {run_id} is not reproducible: fields {diff} differ from the stored record")
+        self.store.mirror("runs", run_id)
         return stored
 
     def _committed(self, request: RunRequest) -> dict[str, int]:

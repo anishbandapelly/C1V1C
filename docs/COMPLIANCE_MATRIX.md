@@ -26,7 +26,7 @@ Statuses: **PASS** = implemented and verified by the test or evidence cited · *
 | CORE-07 | Offline fallback | offline mode, FailoverS3, deterministic narrator | — | banner + status captions | AWS failure tests, smoke test | pass | **PASS** | — |
 | CORE-08 | Equity and evidence honesty; missing ≠ 0 | `evidence.Quantity`, labels in UI | — | evidence column on every indicator | `test_quantity_serialisation…`, data-mode tests | pass | **PASS** | — |
 | EXT-01 | Same-budget conventional baselines | `_alternatives` (no investment, equal spend) | — | alternatives table | `test_alternatives…` | pass | **PASS** | — |
-| EXT-02 | S3 versioned runs / Bedrock | `aws/` | — | `GET /aws/status` | stubbed S3/Bedrock tests | pass (stubbed) | **BLOCKED** (live) | Credentials and model access needed ([AWS_SERVICES.md](AWS_SERVICES.md)) |
+| EXT-02 | S3 versioned runs / Bedrock | `aws/`, `run_store.mirror` | — | `GET /aws/status`, `/health` | stubbed tests + live probe | S3 live PASS (runs in bucket); Bedrock AccessDenied | **PARTIAL** | Bedrock needs `bedrock:InvokeModel` ([AWS_SERVICES.md](AWS_SERVICES.md)) |
 
 ## Phase 4–6 brief requirements
 
@@ -51,7 +51,7 @@ Statuses: **PASS** = implemented and verified by the test or evidence cited · *
 | Light and dark mode | **PASS** | Browser checked; contrast test |
 | Secure credentials, no secrets in Git | **PASS** | `secret_safety_check.py` PASS; `.env` ignored; smoke test scans responses |
 | Deployment with post-deploy checks | **PARTIAL** | Docker deployment healthy, 15/15 smoke; no public cloud deployment (needs approval and credentials) |
-| Meaningful AWS integration | **BLOCKED** | Adapters built and tested; no credentials or model access |
+| Meaningful AWS integration | **PARTIAL** | S3 live (runs and comparisons mirrored, encrypted, versioned); Bedrock blocked by IAM |
 | Anti-slop §9 re-audit after integration | **PARTIAL** | Approved design and tokens unchanged; no new §9 score recorded for the new result tables |
 
 ## Known limitations

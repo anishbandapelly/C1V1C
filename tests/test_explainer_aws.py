@@ -154,3 +154,26 @@ def test_missing_credentials_reported_as_blocked():
     out = probe(Settings.load())
     assert out["credentials"].startswith("BLOCKED") and out["s3"].startswith("BLOCKED") and out["bedrock"].startswith("BLOCKED")
     assert "testing" not in str(out)
+
+
+def test_cached_runs_are_mirrored_to_s3_once(engine):
+    class FakeS3:
+        def __init__(self):
+            self.objects, self.puts, self.last_error = {}, 0, None
+
+        def put_json(self, key, body):
+            self.puts += 1
+            self.objects[key] = body
+            return {"key": key}
+
+        def get_text(self, key):
+            return self.objects.get(key)
+
+    req = engine.default_request(budget_inr=5_000_000)
+    run = engine.run(req, use_cache=False)            # stored locally only (no S3 yet)
+    fake = FakeS3()
+    engine.store.s3 = fake
+    engine.run(req)                                    # cache hit -> mirrored
+    engine.run(req)                                    # second hit -> no duplicate upload
+    key = f"{engine.settings.s3_runs_prefix}runs/{run.run_id}.json"
+    assert key in fake.objects and fake.puts == 1

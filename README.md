@@ -9,7 +9,7 @@
 > - Decision explanations are deterministic and grounded in the stored run.
 > - Runs are immutable and reproducible; there is also an HTTP API.
 > - 139 tests pass, 43/43 scientific checks pass, and the Docker deployment passes 15/15 smoke checks.
-> - Live AWS (S3/Bedrock) is **blocked** pending rotated credentials and model access.
+> - Live AWS: **S3 is live** (runs mirrored to the bucket); **Bedrock is blocked** until the IAM user is allowed `bedrock:InvokeModel`.
 >
 > Start with [COMPLIANCE_MATRIX](docs/COMPLIANCE_MATRIX.md), [DATA_PIPELINE](docs/DATA_PIPELINE.md), [MODELS](docs/MODELS.md), [DEPLOYMENT](docs/DEPLOYMENT.md) and [AWS_SERVICES](docs/AWS_SERVICES.md).
 >

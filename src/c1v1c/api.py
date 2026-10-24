@@ -44,7 +44,9 @@ def health() -> dict:
         return {"status": "degraded", "detail": str(exc), "model_version": MODEL_VERSION}
     return {"status": "ok", "model_version": MODEL_VERSION, "baseline_version": e.baseline.version,
             "baseline_sha256": e.baseline.sha256, "data_mode": e.baseline.data_mode.value, "catalog_version": e.catalog_version,
-            "offline_mode": e.settings.offline_mode}
+            "offline_mode": e.settings.offline_mode,
+            "s3_runs": ("disabled" if e.store.s3 is None else f"error: {e.store.s3.last_error}" if e.store.s3.last_error else "enabled"),
+            "bedrock_model_configured": bool(e.settings.bedrock_model_id)}
 
 
 @app.get("/zones")

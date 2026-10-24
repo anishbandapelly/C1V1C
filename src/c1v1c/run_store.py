@@ -21,6 +21,7 @@ class RunStore:
         self.dir = Path(self.settings.runs_dir)
         self.dir.mkdir(parents=True, exist_ok=True)
         self.s3 = s3
+        self._mirrored: set[tuple[str, str]] = set()
 
     def _path(self, kind: str, run_id: str) -> Path:
         if not run_id.replace("-", "").replace("_", "").isalnum():
@@ -42,6 +43,17 @@ class RunStore:
         if self.s3 is not None:
             ref["s3"] = self.s3.put_json(f"{self.settings.s3_runs_prefix}{kind}/{run_id}.json", body)
         return ref
+
+    def mirror(self, kind: str, run_id: str) -> None:
+        """Ensure a locally stored record also exists in S3 (once per process); used on cache hits."""
+        if self.s3 is None or (kind, run_id) in self._mirrored:
+            return
+        path = self._path(kind, run_id)
+        key = f"{self.settings.s3_runs_prefix}{kind}/{run_id}.json"
+        if path.exists() and self.s3.get_text(key) is None:
+            self.s3.put_json(key, path.read_text(encoding="utf-8"))
+        if self.s3.last_error is None:
+            self._mirrored.add((kind, run_id))
 
     def load(self, kind: str, run_id: str, model: type[BaseModel]) -> BaseModel:
         path = self._path(kind, run_id)

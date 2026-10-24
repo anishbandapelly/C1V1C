@@ -11,7 +11,7 @@ ROOT = Path(os.environ.get("C1V1C_ROOT") or Path(__file__).resolve().parents[2])
 
 def _load_dotenv(path: Path) -> None:
     """Load non-secret KEY=VALUE pairs from an ignored local .env without overriding the environment."""
-    if not path.exists():
+    if not path.exists() or os.environ.get("C1V1C_SKIP_DOTENV") == "1":
         return
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()

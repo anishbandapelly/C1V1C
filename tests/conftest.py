@@ -25,7 +25,8 @@ def isolated_env(tmp_path, monkeypatch):
     """Every test writes runs to its own folder and never touches AWS unless it stubs a client."""
     monkeypatch.setenv("C1V1C_RUNS_DIR", str(tmp_path / "runs"))
     monkeypatch.setenv("C1V1C_OFFLINE_MODE", "true")
-    for k in ("AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "AWS_PROFILE"):
+    monkeypatch.setenv("C1V1C_SKIP_DOTENV", "1")  # never read a developer's local .env in tests
+    for k in ("AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "AWS_PROFILE", "S3_BUCKET", "BEDROCK_MODEL_ID"):
         monkeypatch.delenv(k, raising=False)
     monkeypatch.setenv("AWS_SHARED_CREDENTIALS_FILE", str(tmp_path / "no-credentials"))
     monkeypatch.setenv("AWS_CONFIG_FILE", str(tmp_path / "no-config"))

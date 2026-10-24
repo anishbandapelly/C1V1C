@@ -22,15 +22,7 @@ SHOCKS = {'Extreme rainfall': 'extreme_rain', 'Drought': 'drought', 'Sudden budg
 
 @st.cache_resource(show_spinner='Loading the Bengaluru baseline…')
 def _engine() -> Engine:
-    settings = Settings.load()
-    s3 = None
-    if not settings.offline_mode and settings.s3_bucket:
-        from c1v1c.aws.s3 import FailoverS3, S3Store, S3Unavailable
-        try:
-            s3 = FailoverS3(S3Store(settings))
-        except S3Unavailable:
-            s3 = None
-    return Engine(settings, s3=s3)
+    return Engine(Settings.load())  # the engine attaches S3 itself when online
 
 
 def engine() -> Engine | None:

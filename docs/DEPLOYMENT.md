@@ -34,6 +34,16 @@ streamlit run app.py
 uvicorn c1v1c.api:app --port 8000
 ```
 
+## Online mode (live AWS)
+
+```bash
+powershell -ExecutionPolicy Bypass -File scripts/aws_configure.ps1                 # once: you type a rotated key into %USERPROFILE%\.aws
+docker compose -f docker-compose.yml -f docker-compose.aws.yml up -d --build      # mounts ~/.aws read-only, C1V1C_OFFLINE_MODE=false
+python scripts/smoke_test.py
+```
+
+Verified 24 Oct 2026: credentials PASS, S3 PASS, runs mirrored to S3, smoke test 15/15. Bedrock is blocked by IAM (see AWS_SERVICES.md).
+
 ## Configuration
 
 Non-secret settings come from `.env.example`. Copy it to an ignored `.env` for local use; the variable names follow master plan §9.5.

@@ -1,0 +1,17 @@
+# Opt-in live AWS overlay:  docker compose -f docker-compose.yml -f docker-compose.aws.yml up -d
+# Mounts the host's ~/.aws read-only and selects a named profile. No credential values live in this file,
+# the image or the repository. Non-secret values (profile name, model id) come from the ignored .env.
+x-aws: &aws
+  environment:
+    C1V1C_OFFLINE_MODE: "false"
+    AWS_PROFILE: ${AWS_PROFILE:-c1v1c}
+    AWS_SDK_LOAD_CONFIG: "1"
+    AWS_CONFIG_FILE: /home/c1v1c/.aws/config
+    AWS_SHARED_CREDENTIALS_FILE: /home/c1v1c/.aws/credentials
+    BEDROCK_MODEL_ID: ${BEDROCK_MODEL_ID:-}
+  volumes:
+    - ${USERPROFILE:-~}/.aws:/home/c1v1c/.aws:ro
+
+services:
+  app: *aws
+  api: *aws
