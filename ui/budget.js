@@ -2,7 +2,7 @@ export default function({parentElement,data,setStateValue}){
  const input=parentElement.querySelector('input'),error=parentElement.querySelector('[role=alert]');
  let committed=data.committed;input.value=data.value;
  const valid=value=>/^\d+(?:\.\d{0,7})?$/.test(value)&&Number(value)<=100;
- const previewButtons=()=>[...document.querySelectorAll('button')].filter(button=>button.textContent.trim()==='Preview allocation');
+ const previewButtons=()=>[...document.querySelectorAll('button')].filter(button=>button.textContent.trim()==='Run optimisation');
  const syncButton=()=>previewButtons().forEach(button=>{button.disabled=!valid(input.value.trim())});
  if(!valid(input.value)){error.textContent='Enter 0-100 crore using a period; up to 7 decimal places.';input.setAttribute('aria-invalid','true')}
  const clear=()=>{error.textContent='';input.removeAttribute('aria-invalid')};
