@@ -110,7 +110,12 @@ def explain(run: RunResult, zone_names: dict[str, str], comparisons: list[Scenar
     shock = []
     for c in comparisons:
         b, a = c.b_original_under_shock, c.a_original_normal
+        res = c.deltas.get("residual_runoff_m3", {})
         line = f"{c.scenario.name}: unchanged plan score {a.score:.4f} -> {b.score:.4f}"
+        if res.get("A") is not None and res.get("B") is not None and abs(res["B"] - res["A"]) > 1e-6:
+            line += f"; design-event runoff left unmanaged {res['A']:,.0f} -> {res['B']:,.0f} m3"
+        if b.metrics.get("W") is not None and abs((b.metrics["W"] or 0) - (a.metrics["W"] or 0)) > 1e-6:
+            line += f"; usable water {a.metrics['W']:,.1f} -> {b.metrics['W']:,.1f} m3/yr"
         if not c.b_feasible:
             line += " and it is no longer feasible (" + "; ".join(c.b_notes[:2]) + ")"
         if c.c_reoptimised.outcome is not None:

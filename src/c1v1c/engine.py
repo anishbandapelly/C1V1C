@@ -335,6 +335,9 @@ class Engine:
             cv = c.outcome.metrics[m] if c.outcome else None
             deltas[m] = {"A": av, "B": bv, "C": cv, "B_minus_A": None if av is None or bv is None else bv - av,
                          "C_minus_B": None if cv is None or bv is None else cv - bv}
+        def residual(o):
+            return None if o is None else sum(z["residual_runoff_m3"] for z in o.by_zone.values())
+        deltas["residual_runoff_m3"] = {"A": residual(a), "B": residual(b), "C": residual(c.outcome)}
         deltas["capex_inr"] = {"A": a.capex_inr, "B": b.capex_inr, "C": c.outcome.capex_inr if c.outcome else None}
         deltas["score"] = {"A": a.score, "B": b.score, "C": c.evaluated_score}
         deltas["equity_gain"] = {"A": a.equity_gain, "B": b.equity_gain, "C": c.outcome.equity_gain if c.outcome else None}

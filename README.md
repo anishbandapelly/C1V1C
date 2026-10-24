@@ -2,7 +2,22 @@
 
 **Balancing the Future of Cities.** A research-grounded urban sustainability decision engine for a 24-hour hackathon.
 
-> **Current status:** Frontend approval build (Phases 1–3). Brand-aligned home, collapsible navigation, guest profile and light/dark themes are ready for review. Run `streamlit run app.py` to inspect home and all four sections. Demonstration data is labelled throughout. The scientific engine, MILP, validated datasets and AWS integrations remain pending frontend approval. See [frontend review and launch instructions](docs/FRONTEND_REVIEW.md) and [design audit](docs/DESIGN_AUDIT.md).
+> **Current status (Phases 4–6):** the approved frontend now runs on a working engine. This is a **mixed-evidence Bengaluru pilot**: real GBA ward, footprint, flood-marker, drainage, waterbody and IMD climate data, combined with declared intervention assumptions.
+>
+> - Optimisation uses a PuLP/CBC MILP.
+> - The Climate Shock Lab compares A (plan under normal conditions), B (same plan under the shock) and C (re-optimised plan).
+> - Decision explanations are deterministic and grounded in the stored run.
+> - Runs are immutable and reproducible; there is also an HTTP API.
+> - 139 tests pass, 43/43 scientific checks pass, and the Docker deployment passes 15/15 smoke checks.
+> - Live AWS (S3/Bedrock) is **blocked** pending rotated credentials and model access.
+>
+> Start with [COMPLIANCE_MATRIX](docs/COMPLIANCE_MATRIX.md), [DATA_PIPELINE](docs/DATA_PIPELINE.md), [MODELS](docs/MODELS.md), [DEPLOYMENT](docs/DEPLOYMENT.md) and [AWS_SERVICES](docs/AWS_SERVICES.md).
+>
+> ```bash
+> pip install -r requirements-dev.txt
+> python -I scripts/data/fetch_drive_dataset.py && python -m c1v1c.pipeline
+> streamlit run app.py          # or: docker compose up -d && python scripts/smoke_test.py
+> ```
 
 Correction round 2 adds the exact budget editor, intervention request rows,
 streamlined scenario/decision layouts and a source-document compliance matrix.

@@ -388,6 +388,10 @@ def shock_lab():
             d = comp.deltas[m]
             rows.append({'Measure': f'{METRIC_TITLES[m]} · {SHORT_UNITS[m]}', 'A · original, normal': num(d['A']),
                          'B · original under shock': num(d['B']), 'C · re-optimised': num(d['C'])})
+        res = comp.deltas.get('residual_runoff_m3')
+        if res:
+            rows.append({'Measure': 'Design-event runoff left unmanaged · m³ / event (residual risk)', 'A · original, normal': num(res['A'], 0),
+                         'B · original under shock': num(res['B'], 0), 'C · re-optimised': num(res['C'], 0)})
         rows.append({'Measure': 'Weighted score (same scales)', 'A · original, normal': f"{comp.deltas['score']['A']:.4f}",
                      'B · original under shock': f"{comp.deltas['score']['B']:.4f}",
                      'C · re-optimised': f"{comp.deltas['score']['C']:.4f}" if comp.deltas['score']['C'] is not None else '—'})
@@ -415,7 +419,8 @@ def shock_lab():
             fig.add_trace(go.Bar(name=METRIC_TITLES[m].split(' ·')[0], x=labels, y=norm, marker_color=color))
         fig.update_layout(barmode='group', yaxis_title='normalised benefit (share of reference)', height=300)
         st.plotly_chart(chart_style(fig), width='stretch', key='shock_chart')
-        st.caption('Bars use the same fixed normalisation scales for A, B and C, so they are directly comparable.')
+        st.caption('Bars use the same fixed normalisation scales for A, B and C, so they are directly comparable. Benefits can '
+                   'rise under a stronger storm (tanks fill faster) while residual unmanaged runoff rises more — read both rows.')
         with st.expander('Sensitivity of the comparison'):
             s = comp.sensitivity
             ledger([{'Plan': k, 'Min score': f"{v['min']:.4f}", 'Mean': f"{v['mean']:.4f}", 'Max': f"{v['max']:.4f}", 'Cases': v['cases']}

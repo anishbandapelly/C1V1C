@@ -101,3 +101,10 @@ def test_run_store_refuses_overwrites(engine, tmp_path):
         store.save("runs", run.run_id, tampered)
     with pytest.raises(ValueError):
         store.load("runs", "../../etc/passwd", RunResult)
+
+
+def test_extreme_rain_increases_residual_runoff(engine, original):
+    comp = engine.shock(original, "extreme_rain", {"design_intensity_multiplier": 1.3})
+    res = comp.deltas["residual_runoff_m3"]
+    assert res["B"] > res["A"]          # the stress shows up as more unmanaged runoff, even if benefits rise
+    assert res["C"] <= res["B"] + 1e-9 or comp.c_reoptimised.evaluated_score >= comp.b_original_under_shock.score

@@ -198,6 +198,7 @@ def evaluate_portfolio(baseline: Baseline, candidates: list[Candidate], counts: 
             "capex_inr": sum(by_id[k].capex_inr * n for k, n in zc.items()),
             "design_event_runoff_m3": event_runoff,
             "event_runoff_managed_share": f / event_runoff if event_runoff > 0 else None,
+            "residual_runoff_m3": event_runoff - f,
             "heat_exposure_baseline": h0,
             "heat_exposure_after": h0 - h,
             "population": pop,

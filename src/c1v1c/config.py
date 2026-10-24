@@ -5,7 +5,8 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+# Repository root (config/, data/). Override with C1V1C_ROOT when the package is installed elsewhere.
+ROOT = Path(os.environ.get("C1V1C_ROOT") or Path(__file__).resolve().parents[2])
 
 
 def _load_dotenv(path: Path) -> None:

@@ -1,0 +1,28 @@
+# Local production-like deployment. Secrets are never placed here: AWS access, when enabled,
+# comes from the host's credential chain (e.g. mounted profile or an instance/task role).
+services:
+  app:
+    build: .
+    image: c1v1c-tulabhara:latest
+    ports: ["8501:8501"]
+    env_file: [.env.example]
+    environment:
+      C1V1C_OFFLINE_MODE: "true"
+    volumes: ["c1v1c-runs:/app/runs"]
+    restart: unless-stopped
+  api:
+    image: c1v1c-tulabhara:latest
+    depends_on: [app]
+    command: ["python", "-m", "uvicorn", "c1v1c.api:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports: ["8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if b'\"ok\"' in urllib.request.urlopen('http://localhost:8000/health',timeout=4).read() else 1)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    env_file: [.env.example]
+    volumes: ["c1v1c-runs:/app/runs"]
+    restart: unless-stopped
+volumes:
+  c1v1c-runs: {}
