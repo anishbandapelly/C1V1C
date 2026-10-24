@@ -1,0 +1,36 @@
+{
+  "version": "params-2026-10-24.1",
+  "note": "Every parameter declares its evidence class and source. 'assumed' values are D-grade planning assumptions and are user-visible.",
+  "parameters": {
+    "design_storm_duration_h": {"value": 1.0, "unit": "h", "evidence": "assumed", "source": "Planning assumption: 1-hour design storm for small urban ward catchments"},
+    "design_return_period_basis": {"value": "mean annual maximum daily rainfall", "unit": "-", "evidence": "derived", "source": "IMD 0.5 deg gridded daily rainfall 1971-2005, nearest cell to zone centroid"},
+    "c_impervious": {"value": 0.90, "unit": "-", "evidence": "estimated", "source": "Rational-method coefficient for roofs/paving (0.75-0.95), standard hydrology texts (e.g. Chow, Maidment & Mays 1988)", "low": 0.75, "high": 0.95},
+    "c_pervious": {"value": 0.25, "unit": "-", "evidence": "estimated", "source": "Rational-method coefficient for urban lawns/open soil (0.10-0.35)", "low": 0.10, "high": 0.35},
+    "c_vegetated_plot": {"value": 0.15, "unit": "-", "evidence": "estimated", "source": "Rational-method coefficient for dense planting / woodland (0.05-0.25)", "low": 0.05, "high": 0.25},
+    "non_building_impervious_fraction": {"value": 0.25, "unit": "fraction of non-building area", "evidence": "assumed", "source": "Planning assumption for roads and paving not captured by building footprints", "low": 0.15, "high": 0.40},
+    "rwh_collection_efficiency": {"value": 0.80, "unit": "-", "evidence": "estimated", "source": "Hard-roof runoff coefficient 0.75-0.90 commonly used in Indian rainwater-harvesting manuals (e.g. CGWB)", "low": 0.75, "high": 0.90},
+    "rwh_demand_m3_day": {"value": 0.50, "unit": "m3/day per tank", "evidence": "assumed", "source": "Planning assumption: non-potable use of a small residential block"},
+    "roof_eligible_fraction": {"value": 0.05, "unit": "fraction of building-footprint area", "evidence": "assumed", "source": "Planning assumption: share of detected footprint roof area screened as programme-eligible (structure, ownership, access unverified)"},
+    "plantable_fraction_of_open_land": {"value": 0.02, "unit": "fraction of non-built zone area", "evidence": "assumed", "source": "Planning assumption: share of non-building land that could be available public planting land (not verified)"},
+    "forest_crown_fraction_avg_10y": {"value": 0.5, "unit": "-", "evidence": "assumed", "source": "Planning assumption: average crown cover over a 10-year establishment period"},
+    "crown_carbon_rate_tc_ha_yr": {"value": 2.9, "unit": "tC per ha crown cover per yr", "evidence": "estimated", "source": "IPCC 2006 Guidelines Vol.4 Ch.8 (Settlements), Tier 2 crown-cover default", "low": 1.8, "high": 3.4},
+    "carbon_horizon_y": {"value": 10, "unit": "years", "evidence": "assumed", "source": "Master plan §4.4 common 10-year horizon"},
+    "discount_rate": {"value": 0.05, "unit": "per year (real)", "evidence": "assumed", "source": "Master plan §4.5.4 design default"},
+    "lcc_horizon_y": {"value": 10, "unit": "years", "evidence": "assumed", "source": "Master plan §4.5.4"},
+    "temperature_norm_bounds_c": {"value": [20.0, 45.0], "unit": "degC", "evidence": "assumed", "source": "Master plan §4.5.2 illustrative bounds"},
+    "equity_alpha": {"value": 1.0, "unit": "-", "evidence": "assumed", "source": "Planning assumption: linear vulnerability weight on SC/ST population share"}
+  },
+  "normalisation": {
+    "note": "Fixed reference scales tau (master plan §5.3): identical across portfolios and shocks. Each tau is the benefit of spending the default 2 crore entirely on the single best unit type for that objective in the normal scenario, computed by the engine and frozen in the baseline manifest.",
+    "method": "single_type_reference_at_default_budget"
+  },
+  "priority_modes": {
+    "note": "Order F, W, H, G, Equity, LCC. Balanced is the master plan's full preset; for the '-first' modes the master plan fixes only the primary weight and the remaining split is the approved frontend's preset (ui/fixtures.py).",
+    "Balanced":     [0.25, 0.20, 0.20, 0.10, 0.15, 0.10],
+    "Flood-first":  [0.55, 0.10, 0.10, 0.05, 0.10, 0.10],
+    "Water-first":  [0.10, 0.55, 0.10, 0.05, 0.10, 0.10],
+    "Heat-first":   [0.10, 0.10, 0.55, 0.05, 0.10, 0.10],
+    "Equity-first": [0.15, 0.15, 0.10, 0.05, 0.45, 0.10]
+  },
+  "solver": {"time_limit_s": 20, "gap_rel": 0.0, "alternatives": 3, "min_alternative_distance_units": 2}
+}

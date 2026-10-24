@@ -48,3 +48,6 @@ secrets.yml
 *.tfvars
 *.tfstate
 *.tfstate.*
+
+# Local package build metadata
+*.egg-info/

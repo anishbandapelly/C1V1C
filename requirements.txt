@@ -1,11 +1,10 @@
-# Bootstrap compatible ranges, NOT a verified final lock. Codex must install,
-# run all application tests, then create a validated lock for the target Python.
-# Target interpreter: Python 3.11; support other versions only after testing.
-pydantic>=2,<3
-pandas>=2,<3
+# Runtime: Streamlit workspace + HTTP API + engine (Python 3.11).
+pydantic>=2.7,<3
+pandas>=2.2,<3
 numpy>=1.26,<3
 PuLP>=2.8,<4
 streamlit>=1.40,<2
 plotly>=5,<7
 boto3>=1.34
-pytest>=8,<10
+fastapi>=0.110,<1
+uvicorn[standard]>=0.29,<1

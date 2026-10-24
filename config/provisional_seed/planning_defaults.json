@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "project": "C1V1C — Tulabhara AI",
+  "schema_version": "2026-10-24.provisional.1",
+  "configuration_status": "PLANNING_DEFAULTS_NOT_EMPIRICALLY_VALIDATED",
+  "currency": "INR",
+  "units": {
+    "budget_display": "INR crore",
+    "budget_base": "INR",
+    "rainfall": "mm/day",
+    "area": "m2",
+    "volume": "m3",
+    "distance": "m"
+  },
+  "financial": {
+    "initial_capital_budget_crore": "2.0",
+    "initial_capital_budget_inr": 20000000,
+    "crore_to_inr": 10000000,
+    "source": "Project development instructions; reconcile with master plan and approved frontend",
+    "status": "ASSUMPTION_FOR_DEMONSTRATION_NOT_OBSERVED_CITY_BUDGET"
+  },
+  "pilot": {
+    "required_zone_count": 3,
+    "geography_source": "raw/boundaries/gba-369-wards-december-2025.kml",
+    "zone_selection_rule": "Choose 3 real, geographically coherent pilot polygons derived from verified wards; persist selected ward composite keys and GIS geometry; never synthesize polygon coordinates.",
+    "zone_geometry_status": "UNSELECTED",
+    "population_source_type": "KML attributes with known inconsistent total and sex subtotals; must validate",
+    "status": "NOT_CONFIGURED"
+  },
+  "priority_modes": [
+    "balanced",
+    "flood_first",
+    "water_first",
+    "heat_first",
+    "equity_first"
+  ],
+  "priority_weight_policies": {
+    "status": "MISSING_VERIFIED_MASTER_PLAN_VALUES",
+    "rule": "Read the authoritative master plan; use its numeric weights if available. Otherwise expose mode selection but reject production solve pending declared and normalized weights; optional clearly labeled test profile can be user-specified.",
+    "normalized_weight_sum_required": "1.0"
+  },
+  "scenarios": {
+    "normal": {
+      "rainfall_multiplier": 1.0,
+      "tree_cooling_multiplier": 1.0,
+      "capital_budget_multiplier": 1.0
+    },
+    "extreme_rain": {
+      "rainfall_multiplier": 1.3,
+      "tree_cooling_multiplier": 1.0,
+      "capital_budget_multiplier": 1.0
+    },
+    "drought": {
+      "rainfall_multiplier": 0.6,
+      "tree_cooling_multiplier": 0.7,
+      "capital_budget_multiplier": 1.0
+    },
+    "budget_cut": {
+      "rainfall_multiplier": 1.0,
+      "tree_cooling_multiplier": 1.0,
+      "capital_budget_multiplier": 0.7
+    }
+  },
+  "scenario_values_status": "ILLUSTRATIVE_MASTER_PLAN_VALUES_REPORTED_IN_PRIOR_PROJECT_INSTRUCTIONS_RECHECK_AUTHORITATIVE_DOC",
+  "solver": {
+    "family": "PuLP/CBC MILP",
+    "status": "TO_IMPLEMENT",
+    "must_verify_feasibility": true
+  },
+  "run_comparison": [
+    "baseline_normal",
+    "original_portfolio_under_shock",
+    "reoptimised_portfolio_under_shock"
+  ],
+  "production_restrictions": {
+    "allow_unsourced_costs": false,
+    "allow_unsourced_impact_coefficients": false,
+    "allow_invented_ward_geometry": false,
+    "allow_broken_1971_curated_rainfall": false,
+    "allow_outside_pilot_heat_dataset_as_bengaluru": false,
+    "allow_flood_hazard_points_as_eligible_sites": false,
+    "label_estimates_and_missing": true
+  }
+}

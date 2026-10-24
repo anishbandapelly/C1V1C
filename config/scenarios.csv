@@ -1,0 +1,5 @@
+scenario_id,scenario_name,rainfall_multiplier,rainfall_availability_factor,tree_cooling_factor,budget_factor,classification,source,notes
+normal,Normal baseline,1.00,1.00,1.00,1.00,ILLUSTRATIVE_PLANNING_PRESET,"Master plan §6.3; data/synthetic_test/scenario_fixture.csv","Historical-climate baseline; not a forecast"
+extreme_rain,Extreme rainfall,1.30,1.00,1.00,1.00,ILLUSTRATIVE_PLANNING_PRESET,"Master plan §6.3 design intensity x1.30","Stress test of the design storm; not a forecast"
+drought,Drought,1.00,0.60,0.70,1.00,ILLUSTRATIVE_PLANNING_PRESET,"Master plan §6.3 rainfall availability x0.60, tree cooling x0.70","Scales the historical daily series; not projected climate"
+budget_cut,Sudden budget cut,1.00,1.00,1.00,0.70,ILLUSTRATIVE_PLANNING_PRESET,"Master plan §6.3 capital envelope x0.70","Original portfolio may exceed the revised envelope"

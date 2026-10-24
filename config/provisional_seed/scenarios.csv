@@ -1,0 +1,5 @@
+scenario_id,scenario_name,rainfall_factor,tree_cooling_factor,capital_budget_factor,classification,source,notes
+normal,Normal baseline,1.00,1.00,1.00,ILLUSTRATIVE_PLANNING_PRESET,Previous C1V1C master-plan prompt; verify authoritative document,Not a weather forecast; calculate baseline and selected portfolio consistently
+extreme_rain,Extreme rainfall,1.30,1.00,1.00,ILLUSTRATIVE_PLANNING_PRESET,Previous C1V1C master-plan prompt; verify authoritative document,Re-evaluate original portfolio and reoptimise using shock
+drought,Drought,0.60,0.70,1.00,ILLUSTRATIVE_PLANNING_PRESET,Previous C1V1C master-plan prompt; verify authoritative document,Rainfall and tree-cooling effect scale independently; not projected climate
+budget_cut,Sudden budget cut,1.00,1.00,0.70,ILLUSTRATIVE_PLANNING_PRESET,Previous C1V1C master-plan prompt; verify authoritative document,Original portfolio may become infeasible; report actual feasibility then separately reoptimise

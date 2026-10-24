@@ -1,0 +1,4 @@
+zone_id,zone_name,source_ward_composite_keys,geometry_source,population_total,population_reference_year,area_m2,boundary_validation,production_enabled,notes
+PILOT_1,,,gba-369-wards-december-2025.kml,,,,UNSELECTED,false,"Placeholder zone ID only. No synthetic ward selection, coordinates, area, or population."
+PILOT_2,,,gba-369-wards-december-2025.kml,,,,UNSELECTED,false,"Placeholder zone ID only. No synthetic ward selection, coordinates, area, or population."
+PILOT_3,,,gba-369-wards-december-2025.kml,,,,UNSELECTED,false,"Placeholder zone ID only. No synthetic ward selection, coordinates, area, or population."

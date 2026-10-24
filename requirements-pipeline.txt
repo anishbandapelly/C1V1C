@@ -1,0 +1,8 @@
+# Data pipeline (raw Drive collection -> curated baseline). Not needed to run the app.
+-r requirements.txt
+geopandas>=1.0,<2
+pyogrio>=0.9
+shapely>=2.0,<3
+pyproj>=3.6
+requests>=2.31
+gdown>=5.2

@@ -1,0 +1,20 @@
+workspace_expected_path,meaning,folder_presence,use_status,limitation
+raw/boundaries/gba-369-wards-december-2025.kml,GBA 369 ward polygons,PRESENT_IN_STANDALONE_DRIVE,REQUIRES_POPULATION_AND_GEOMETRY_QA,Source geographic polygons; no selected 3 pilot zones yet
+raw/references/building_footprints/building_footprints_bengaluru.geojsonl,Microsoft ML building footprints,PRESENT_IN_STANDALONE_DRIVE,FOOTPRINTS_NOT_ROOF_ELIGIBILITY,597376 features per Drive provenance; imagery vintage varies
+raw/references/terrain/DEM_SRTM/,SRTM elevation raster tiles,PRESENT_IN_STANDALONE_DRIVE,TILES_REQUIRE_MOSAIC_AND_CRS_VALIDATION,Bengaluru tile present per dataset provenance
+raw/references/stormwater_drainage/maps/,Drainage mapping,PRESENT_IN_STANDALONE_DRIVE,NETWORK_GEOMETRY_PRESENT_CAPACITY_NOT_VALIDATED,Map KML/PDF does not establish measured capacity/condition
+raw/rainfall/IMD_GRIDED_WEATHER/,IMD rainfall text grids,PRESENT_IN_STANDALONE_DRIVE,TIME_AXIS_OF_CURATED_FILE_BROKEN,"Rebuild dates from authentic source timing, never fabricate"
+curated/rainfall.csv,Processed rainfall daily series,PRESENT_IN_STANDALONE_DRIVE,QUARANTINED_DATE_ERROR,All 51136 rows previously observed as 1971-01-01
+raw/rainfall/DOC-20261023-WA0007.csv,1951-2024 daily weather table,PRESENT_IN_STANDALONE_DRIVE,SOURCE_LOCATION_AND_UNITS_NOT_VALIDATED,Treat rainfall and temperature as preliminary only
+raw/references/urban_heat/extracted/urban_heat_island_spatiotemporal_dataset.csv,Spatial heat and temperature observations,PRESENT_IN_STANDALONE_DRIVE,GEO_COVERAGE_NOT_BENGALURU,Sample latitude ~11.0 longitude ~76.9; reject rows outside pilot and inspect if any overlap
+raw/references/water_supply/,Water supply city-level summary CSV,PRESENT_IN_STANDALONE_DRIVE,NOT_ZONE_DEMAND,Some city-level historical/projection tables; cannot infer zone water demand without defensible allocation
+raw/references/carbon_sequestration/,Carbon reference research paper,PRESENT_IN_STANDALONE_DRIVE,COEFFICIENTS_NOT_EXTRACTED,Need evidence-supported local effect coefficients
+raw/references/groundwater_potential/,Groundwater location layer,PRESENT_IN_STANDALONE_DRIVE,VALIDATION_REQUIRED,No verified extraction-based zone demand
+raw/references/soil_HWSD_FAO/,Global soil map and tables,PRESENT_IN_STANDALONE_DRIVE,CLIP_VALIDATE,No verified local infiltration coefficient
+raw/waterbodies/,Waterbodies and hazard KMLs,PRESENT_IN_STANDALONE_DRIVE,MIXED_CLASSIFICATION,Verify actual lakes versus flood locations and separate
+curated/sites.csv,Flood/vulnerability site points,PRESENT_IN_STANDALONE_DRIVE,RAW_LOCATIONS_UNVERIFIED,399 records; known invalid coordinate / duplicate coordinate issue
+curated/zones.csv,Pilot zone table,PRESENT_IN_STANDALONE_DRIVE,HEADER_ONLY,Do not treat as completed geographic zones
+curated/zones.geojson,Pilot zone feature collection,PRESENT_IN_STANDALONE_DRIVE,NEEDS_CONTENT_VALIDATION,Very small 227 byte template; verify actual feature count
+curated/scenarios.csv,Scenario settings,PRESENT_IN_STANDALONE_DRIVE,HEADER_ONLY,"Use scenarios.csv in this pack for assumptions, replace after verification"
+curated/interventions.csv,Sustainability planning recommendations,PRESENT_IN_STANDALONE_DRIVE,NOT_QUANTIFIED_FOR_SOLVER,Source recommendations not per-unit cost/effect catalogue
+curated/provenance.csv,Data lineage and caveats,PRESENT_IN_STANDALONE_DRIVE,REVIEW_AGAINST_NEW_RAW_UPLOADS,"Has some stale statements made before ward, footprint, etc were added"

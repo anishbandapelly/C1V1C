@@ -1,0 +1,8 @@
+parameter_id,value,unit,data_class,source,notes
+capital_budget_default,20000000,INR,PROJECT_PLANNING_DEFAULT,Previous C1V1C prompt; verify master plan,"Used only as application default, not an observed municipal budget"
+crore_conversion,10000000,INR/crore,UNIT_DEFINITION,Indian number system,Do not display decimal comma unless locale design explicitly requires it
+three_pilot_zones,3,count,PROJECT_REQUIREMENT,Prior project instructions/master plan,Zones must be grounded in real GBA ward geometry
+rainfall_extreme_multiplier,1.30,dimensionless,ILLUSTRATIVE_SCENARIO,Previous C1V1C prompt; verify master plan,Editable; cannot be represented as empirical forecast
+rainfall_drought_multiplier,0.60,dimensionless,ILLUSTRATIVE_SCENARIO,Previous C1V1C prompt; verify master plan,Editable; cannot be represented as empirical forecast
+tree_cooling_drought_multiplier,0.70,dimensionless,ILLUSTRATIVE_SCENARIO,Previous C1V1C prompt; verify master plan,Editable; illustrative only
+budget_cut_capital_multiplier,0.70,dimensionless,ILLUSTRATIVE_SCENARIO,Previous C1V1C prompt; verify master plan,Editable; check original portfolio feasibility
