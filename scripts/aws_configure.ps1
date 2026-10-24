@@ -23,6 +23,16 @@ New-Item -ItemType Directory -Force -Path $dir | Out-Null
 
 $keyId = (Read-Host "AWS Access Key ID (new, rotated key)").Trim()
 if ($keyId -notmatch '^(AKIA|ASIA)[A-Z0-9]{12,}$') { throw 'That does not look like an AWS access key ID.' }
+$credFile = Join-Path $dir 'credentials'
+if (Test-Path $credFile) {
+    $inSection = $false
+    foreach ($line in Get-Content $credFile) {
+        if ($line -match '^\s*\[(.+)\]\s*$') { $inSection = ($Matches[1].Trim() -eq $Profile) }
+        elseif ($inSection -and $line -match '^\s*aws_access_key_id\s*=\s*(\S+)' -and $Matches[1] -eq $keyId) {
+            throw "This is the key already saved in profile '$Profile'. Enter the NEW key you created (rotation)."
+        }
+    }
+}
 $secure = Read-Host "AWS Secret Access Key (hidden)" -AsSecureString
 $secret = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure))
 if ($secret.Length -lt 30) { throw 'The secret access key looks too short.' }
