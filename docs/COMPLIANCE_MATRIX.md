@@ -4,7 +4,7 @@ Statuses: **PASS** = implemented and verified by the test or evidence cited · *
 
 **Test evidence:**
 
-- `pytest`: **139 passed** (api 4, explainer/AWS 12, frontend 43, handoff 10, models 11, optimiser 34, pipeline 9, reference fixtures 6, scenarios 10).
+- `pytest`: **141 passed** (api 4, explainer/AWS 13, frontend 43, handoff 10, models 11, optimiser 34, pipeline 9, reference fixtures 6, scenarios 11).
 - `scripts/validate_science.py`: **43/43 PASS** ([SCIENTIFIC_VALIDATION.md](SCIENTIFIC_VALIDATION.md)).
 - `scripts/smoke_test.py` against the Docker deployment: **15/15 PASS**.
 
@@ -16,7 +16,7 @@ Statuses: **PASS** = implemented and verified by the test or evidence cited · *
 | PS-02 | Optimise combinations of all 4 interventions | `optimiser.py` (PuLP/CBC MILP) | assumption catalogue + baseline | Investment Optimiser; `POST /runs` | `test_milp_matches_brute_force` (20 cases), constraint tests | pass | **PASS** | Unit costs and effects are master-plan assumptions (grade D), not Bengaluru-validated |
 | PS-03 | Interactive dashboard: risks, costs, allocation, neighbourhood benefits | `ui/views.py` on the engine | baseline + runs | 4 pages + map | `test_frontend.py` (43), browser check light/dark | pass | **PASS** | Visual regression at 5 widths × 2 themes not re-captured (spot-checked 800 and 1440 px, both themes) |
 | PS-04 | Drought, extreme rain, budget cut; original vs re-optimised | `engine.shock` (A/B/C) | IMD daily series, scenario presets | Climate Shock Lab; `POST /runs/{id}/shocks` | `test_scenarios.py` (10), UI shock tests | pass | **PASS** | Shocks are illustrative presets, not forecasts |
-| PS-05 | Explain recommendations, uncertainty, unintended consequences | `explainer.py`, `aws/bedrock.py` | stored run | Decision Intelligence; `GET /runs/{id}/explanation` | explainer tests, number validation | pass | **PASS** (deterministic) / **BLOCKED** (Bedrock live) | No verified Bedrock model or credentials |
+| PS-05 | Explain recommendations, uncertainty, unintended consequences | `explainer.py`, `aws/bedrock.py` | stored run | Decision Intelligence; `GET /runs/{id}/explanation` | explainer tests, number validation | pass | **PASS** (deterministic) / **BLOCKED** (Bedrock live) | IAM granted; AWS account returns "Operation not allowed" for all Claude models (support case needed) |
 | CORE-01 | Multi-objective environment, economy, equity | `evaluate.py` | — | outcome table, score contributions | optimiser + scenario tests | pass | **PASS** | Normalisation scales are declared design choices |
 | CORE-02 | Flood, water, heat, carbon models | `models/*` | IMD, footprints | outcomes | `test_models.py`, 43 science checks | pass | **PARTIAL** | Heat is an index (not °C). Carbon covers forest sequestration only. Drain capacity is unmeasured |
 | CORE-03 | Budget, roof, land, site, prerequisite, exclusion constraints | `optimiser.solve` | — | constraint review | shared-roof, requires/excludes, property tests | pass | **PASS** | Eligible roof and land are assumed fractions |
@@ -26,7 +26,7 @@ Statuses: **PASS** = implemented and verified by the test or evidence cited · *
 | CORE-07 | Offline fallback | offline mode, FailoverS3, deterministic narrator | — | banner + status captions | AWS failure tests, smoke test | pass | **PASS** | — |
 | CORE-08 | Equity and evidence honesty; missing ≠ 0 | `evidence.Quantity`, labels in UI | — | evidence column on every indicator | `test_quantity_serialisation…`, data-mode tests | pass | **PASS** | — |
 | EXT-01 | Same-budget conventional baselines | `_alternatives` (no investment, equal spend) | — | alternatives table | `test_alternatives…` | pass | **PASS** | — |
-| EXT-02 | S3 versioned runs / Bedrock | `aws/`, `run_store.mirror` | — | `GET /aws/status`, `/health` | stubbed tests + live probe | S3 live PASS (runs in bucket); Bedrock AccessDenied | **PARTIAL** | Bedrock needs `bedrock:InvokeModel` ([AWS_SERVICES.md](AWS_SERVICES.md)) |
+| EXT-02 | S3 versioned runs / Bedrock | `aws/`, `run_store.mirror` | — | `GET /aws/status`, `/health` | stubbed tests + live probe | S3 live PASS (runs in bucket); Bedrock account-blocked | **PARTIAL** | Bedrock needs AWS to lift the account restriction ([AWS_SERVICES.md](AWS_SERVICES.md)) |
 
 ## Phase 4–6 brief requirements
 
@@ -51,7 +51,7 @@ Statuses: **PASS** = implemented and verified by the test or evidence cited · *
 | Light and dark mode | **PASS** | Browser checked; contrast test |
 | Secure credentials, no secrets in Git | **PASS** | `secret_safety_check.py` PASS; `.env` ignored; smoke test scans responses |
 | Deployment with post-deploy checks | **PARTIAL** | Docker deployment healthy, 15/15 smoke; no public cloud deployment (needs approval and credentials) |
-| Meaningful AWS integration | **PARTIAL** | S3 live (runs and comparisons mirrored, encrypted, versioned); Bedrock blocked by IAM |
+| Meaningful AWS integration | **PARTIAL** | S3 live (runs and comparisons mirrored, encrypted, versioned); Bedrock blocked at account level |
 | Anti-slop §9 re-audit after integration | **PARTIAL** | Approved design and tokens unchanged; no new §9 score recorded for the new result tables |
 
 ## Known limitations

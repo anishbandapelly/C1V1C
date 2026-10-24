@@ -42,7 +42,7 @@ docker compose -f docker-compose.yml -f docker-compose.aws.yml up -d --build    
 python scripts/smoke_test.py
 ```
 
-Verified 24 Oct 2026: credentials PASS, S3 PASS, runs mirrored to S3, smoke test 15/15. Bedrock is blocked by IAM (see AWS_SERVICES.md).
+Verified 24 Oct 2026: credentials PASS, S3 PASS, runs mirrored to S3, smoke test 15/15. Bedrock is blocked by an AWS account-level restriction ("Operation not allowed"), see AWS_SERVICES.md.
 
 ## Configuration
 
