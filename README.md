@@ -1,4 +1,5 @@
-# C1V1C — Tulabhara AI
+# C1V1C
+Tulabhara AI
 
 **Balancing the Future of Cities.** A research-grounded urban sustainability decision engine for a 24-hour hackathon.
 
