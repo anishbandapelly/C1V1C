@@ -324,7 +324,7 @@ class Engine:
                          f"INR {math.floor(shock_req.budget_inr * scenario.budget_factor):,.0f}: it is no longer affordable.")
         c = self.run(shock_req, parent_run_id=original.run_id, role="reoptimised_under_shock")
         c_counts = c.selected_candidate_counts
-        keys = set(c_counts) | set(original.selected_candidate_counts)
+        keys = sorted(set(c_counts) | set(original.selected_candidate_counts))  # stable order across processes
         additions = {k: c_counts.get(k, 0) - original.selected_candidate_counts.get(k, 0) for k in keys
                      if c_counts.get(k, 0) > original.selected_candidate_counts.get(k, 0)}
         removals = {k: original.selected_candidate_counts.get(k, 0) - c_counts.get(k, 0) for k in keys

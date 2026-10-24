@@ -108,3 +108,18 @@ def test_extreme_rain_increases_residual_runoff(engine, original):
     res = comp.deltas["residual_runoff_m3"]
     assert res["B"] > res["A"]          # the stress shows up as more unmanaged runoff, even if benefits rise
     assert res["C"] <= res["B"] + 1e-9 or comp.c_reoptimised.evaluated_score >= comp.b_original_under_shock.score
+
+
+def test_repeated_shock_across_processes_is_accepted(engine):
+    """Same comparison re-saved with a different dict key order must not be treated as a conflict."""
+    import json
+
+    run = engine.run(engine.default_request(budget_inr=12_000_000), use_cache=False)
+    comp = engine.shock(run, "budget_cut")
+    path = engine.store._path("comparisons", comp.comparison_id)
+    body = json.loads(path.read_text(encoding="utf-8"))
+    body["additions"] = dict(reversed(list(body["additions"].items())))
+    body["removals"] = dict(reversed(list(body["removals"].items())))
+    path.write_text(json.dumps(body), encoding="utf-8")
+    again = engine.shock(run, "budget_cut")
+    assert again.comparison_id == comp.comparison_id and list(again.removals) == sorted(again.removals)

@@ -33,7 +33,7 @@ class RunStore:
         path.parent.mkdir(parents=True, exist_ok=True)
         body = record.model_dump_json(indent=1)
         if path.exists():
-            if path.read_text(encoding="utf-8") != body:
+            if json.loads(path.read_text(encoding="utf-8")) != json.loads(body):  # compare content, not key order
                 raise FileExistsError(f"run {run_id} already exists with different content; runs are immutable")
         else:
             path.write_text(body, encoding="utf-8")
