@@ -6,7 +6,7 @@
 - **S3:** `python -m c1v1c.aws.status` passes head, put, get and delete on `amzn-c1v1-bucket-515820372090-ap-south-2-an`. The deployed API reports `s3_runs: enabled`. Every run and comparison is mirrored to `runs/runs/` and `runs/comparisons/` with AES256 encryption and object versioning. The smoke test is 15/15, run online.
 - **Bedrock:** a real Converse call on `global.anthropic.claude-sonnet-4-5-20250929-v1:0` and `global.anthropic.claude-haiku-4-5-20251001-v1:0` returns **AccessDeniedException: not authorized to perform bedrock:InvokeModel**. `ListFoundationModels` and `ListInferenceProfiles` are also denied. Older apac Claude 3.7 / 4 profiles are end-of-life, and the Nova IDs tried are not offered in ap-south-2. `BEDROCK_MODEL_ID` stays blank and the deterministic explainer is used, labelled as such.
 
-**To unblock Bedrock** (account owner, in IAM): attach this policy to `c1v1-app`. Then make sure Anthropic model access is enabled in the Bedrock console (including the one-time use-case form).
+**To unblock Bedrock** (account owner, in IAM): attach [`config/iam/c1v1-app-bedrock-policy.json`](../config/iam/c1v1-app-bedrock-policy.json) to `c1v1-app` (the app user has no IAM rights, so an admin must do this). Then run `python scripts/enable_bedrock.py`, which sets `BEDROCK_MODEL_ID` only after a live call succeeds. Then make sure Anthropic model access is enabled in the Bedrock console (including the one-time use-case form).
 
 ```json
 {

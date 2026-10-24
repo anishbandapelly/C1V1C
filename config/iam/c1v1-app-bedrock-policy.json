@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "InvokeClaude45ViaGlobalInferenceProfiles",
+      "Effect": "Allow",
+      "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
+      "Resource": [
+        "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5-*",
+        "arn:aws:bedrock:*::foundation-model/anthropic.claude-sonnet-4-5-*",
+        "arn:aws:bedrock:*:*:inference-profile/global.anthropic.claude-haiku-4-5-*",
+        "arn:aws:bedrock:*:*:inference-profile/global.anthropic.claude-sonnet-4-5-*"
+      ]
+    },
+    {
+      "Sid": "DiscoverModels",
+      "Effect": "Allow",
+      "Action": ["bedrock:ListFoundationModels", "bedrock:ListInferenceProfiles", "bedrock:GetInferenceProfile"],
+      "Resource": "*"
+    }
+  ]
+}
